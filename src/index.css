@@ -4,6 +4,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
+/* Segoe UI font family */
+@font-face {
+  font-family: 'Segoe UI';
+  src: local('Segoe UI');
+}
+
 @layer base {
   :root {
     /* Primary - Fresh Green */
@@ -133,12 +139,18 @@
   
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', serif;
   }
+}
+
+@keyframes bubbleRise {
+  0% { opacity: 0; transform: translateY(0) scale(0.5); }
+  10% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-100vh) scale(1); }
 }
 
 @layer components {
