@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Leaf } from "lucide-react";
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Leaf, Download } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const Footer = () => {
@@ -26,18 +26,39 @@ const Footer = () => {
             <img src={logo} alt="VitaDrinks" className="h-16 w-auto brightness-0 invert" />
             <p className="text-primary-foreground/80 text-sm leading-relaxed">
               100% jus naturels et smoothies bio du Cameroun. 
-              Sans sucres ajoutés, sans conservateurs, juste la nature dans votre verre.
+              Sans sucres ajoutes, sans conservateurs, juste la nature dans votre verre.
             </p>
             <div className="flex items-center gap-3">
-              <a href="#" className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
+            </div>
+
+            {/* App Download */}
+            <div className="pt-4 space-y-2">
+              <p className="text-sm font-medium">Telecharger l'application</p>
+              <div className="flex gap-2">
+                <a href="#" className="flex items-center gap-2 px-3 py-2 bg-foreground/90 rounded-lg hover:bg-foreground transition-colors">
+                  <Download className="w-4 h-4" />
+                  <div className="text-left">
+                    <p className="text-[10px] opacity-70">Disponible sur</p>
+                    <p className="text-xs font-semibold">App Store</p>
+                  </div>
+                </a>
+                <a href="#" className="flex items-center gap-2 px-3 py-2 bg-foreground/90 rounded-lg hover:bg-foreground transition-colors">
+                  <Download className="w-4 h-4" />
+                  <div className="text-left">
+                    <p className="text-[10px] opacity-70">Telecharger sur</p>
+                    <p className="text-xs font-semibold">Play Store</p>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
 
@@ -48,16 +69,11 @@ const Footer = () => {
               Liens Rapides
             </h4>
             <ul className="space-y-2">
-              {["Accueil", "Produits", "Vendeurs", "À Propos", "Contact"].map((link) => (
-                <li key={link}>
-                  <Link 
-                    to={`/${link === "Accueil" ? "" : link.toLowerCase().replace(" ", "-")}`}
-                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
+              <li><Link to="/" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Accueil</Link></li>
+              <li><Link to="/products" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Produits</Link></li>
+              <li><Link to="/sellers" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Vendeurs</Link></li>
+              <li><Link to="/about" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">A Propos</Link></li>
+              <li><Link to="/contact" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Contact</Link></li>
             </ul>
           </div>
 
@@ -68,16 +84,11 @@ const Footer = () => {
               Support
             </h4>
             <ul className="space-y-2">
-              {["FAQ", "Livraison", "Retours", "Paiements", "Devenir Vendeur"].map((link) => (
-                <li key={link}>
-                  <Link 
-                    to="#"
-                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
-                  >
-                    {link}
-                  </Link>
-                </li>
-              ))}
+              <li><Link to="/faq" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">FAQ</Link></li>
+              <li><Link to="/delivery" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Livraison</Link></li>
+              <li><Link to="/returns" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Retours</Link></li>
+              <li><Link to="/payments" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Paiements</Link></li>
+              <li><Link to="/seller/register" className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm">Devenir Vendeur</Link></li>
             </ul>
           </div>
 
@@ -107,14 +118,14 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground/20 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-primary-foreground/60">
-            © 2024 VitaDrinks. Tous droits réservés.
+            2024 VitaDrinks. Tous droits reserves.
           </p>
           <div className="flex gap-4 text-sm text-primary-foreground/60">
-            <Link to="#" className="hover:text-primary-foreground transition-colors">
+            <Link to="/terms" className="hover:text-primary-foreground transition-colors">
               Conditions d'utilisation
             </Link>
-            <Link to="#" className="hover:text-primary-foreground transition-colors">
-              Politique de confidentialité
+            <Link to="/privacy" className="hover:text-primary-foreground transition-colors">
+              Politique de confidentialite
             </Link>
           </div>
         </div>
