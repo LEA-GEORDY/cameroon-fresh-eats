@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, User, Menu, X, Search, Heart, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+import AnimatedLogo from "@/components/AnimatedLogo";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
 import SearchModal from "@/components/SearchModal";
@@ -10,12 +10,21 @@ import SearchModal from "@/components/SearchModal";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { items } = useCart();
   const { favorites } = useFavorites();
   
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const favCount = favorites.length;
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { path: "/", label: "Accueil" },
@@ -28,15 +37,15 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 glass-card border-b border-border/50">
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled 
+          ? 'bg-card/70 backdrop-blur-xl border-b border-border/50 shadow-lg' 
+          : 'bg-card/30 backdrop-blur-md'
+      }`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
-            <Link to="/" className="flex items-center gap-2 group">
-              <img 
-                src={logo} 
-                alt="VitaDrinks" 
-                className="h-12 md:h-14 w-auto transition-transform duration-300 group-hover:scale-105" 
-              />
+            <Link to="/" className="flex items-center gap-2">
+              <AnimatedLogo size="md" />
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
@@ -44,7 +53,7 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative font-medium transition-colors duration-300 ${
+                  className={`relative font-medium transition-all duration-300 hover:scale-105 ${
                     isActive(link.path)
                       ? "text-primary"
                       : "text-muted-foreground hover:text-primary"
@@ -52,27 +61,27 @@ const Navbar = () => {
                 >
                   {link.label}
                   {isActive(link.path) && (
-                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary rounded-full" />
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-primary to-secondary rounded-full" />
                   )}
                 </Link>
               ))}
             </div>
 
             <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
                 <MapPin className="w-4 h-4 text-primary" />
                 <span>Cameroun</span>
               </div>
               
-              <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
+              <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hover:bg-primary/10 hover:text-primary transition-colors">
                 <Search className="w-5 h-5" />
               </Button>
               
               <Link to="/profile">
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className="relative hover:bg-secondary/10 hover:text-secondary transition-colors">
                   <Heart className="w-5 h-5" />
                   {favCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs font-bold rounded-full flex items-center justify-center animate-scale-in">
                       {favCount}
                     </span>
                   )}
@@ -80,10 +89,10 @@ const Navbar = () => {
               </Link>
               
               <Link to="/cart">
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className="relative hover:bg-orange/10 hover:text-orange transition-colors">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-secondary-foreground text-xs font-bold rounded-full flex items-center justify-center animate-scale-in">
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-secondary to-orange text-white text-xs font-bold rounded-full flex items-center justify-center animate-scale-in">
                       {cartCount}
                     </span>
                   )}
@@ -91,7 +100,7 @@ const Navbar = () => {
               </Link>
               
               <Link to="/login">
-                <Button variant="default" size="sm" className="gap-2 bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+                <Button variant="default" size="sm" className="gap-2 bg-gradient-to-r from-primary via-secondary to-orange hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105">
                   <User className="w-4 h-4" />
                   Connexion
                 </Button>
@@ -105,7 +114,7 @@ const Navbar = () => {
               <Link to="/cart" className="relative p-2">
                 <ShoppingCart className="w-6 h-6 text-foreground" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-secondary text-secondary-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-secondary to-orange text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
@@ -117,16 +126,16 @@ const Navbar = () => {
           </div>
 
           {isOpen && (
-            <div className="md:hidden py-4 border-t border-border/50 animate-fade-in-up">
+            <div className="md:hidden py-4 border-t border-border/50 animate-fade-in bg-card/90 backdrop-blur-xl rounded-b-2xl">
               <div className="flex flex-col gap-2">
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
-                    className={`px-4 py-3 rounded-xl transition-colors ${
+                    className={`px-4 py-3 rounded-xl transition-all duration-300 ${
                       isActive(link.path)
-                        ? "bg-primary/10 text-primary font-semibold"
+                        ? "bg-gradient-to-r from-primary/10 to-secondary/10 text-primary font-semibold"
                         : "text-muted-foreground hover:bg-muted"
                     }`}
                   >
@@ -134,8 +143,12 @@ const Navbar = () => {
                   </Link>
                 ))}
                 <hr className="my-2 border-border" />
+                <Link to="/profile" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-xl text-muted-foreground hover:bg-muted flex items-center gap-2">
+                  <Heart className="w-4 h-4" />
+                  Favoris ({favCount})
+                </Link>
                 <Link to="/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="default" className="w-full gap-2 bg-gradient-to-r from-primary to-secondary">
+                  <Button variant="default" className="w-full gap-2 bg-gradient-to-r from-primary via-secondary to-orange text-white">
                     <User className="w-4 h-4" />
                     Connexion
                   </Button>
