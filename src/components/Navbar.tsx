@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Search, Heart, MapPin } from "lucide-react";
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch, FiMapPin } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import { useCart } from "@/contexts/CartContext";
-import { useFavorites } from "@/contexts/FavoritesContext";
 import SearchModal from "@/components/SearchModal";
 
 const Navbar = () => {
@@ -13,10 +12,8 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const { items } = useCart();
-  const { favorites } = useFavorites();
   
   const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const favCount = favorites.length;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +26,6 @@ const Navbar = () => {
   const navLinks = [
     { path: "/", label: "Accueil" },
     { path: "/products", label: "Produits" },
-    { path: "/sellers", label: "Vendeurs" },
     { path: "/about", label: "A Propos" },
   ];
 
@@ -69,28 +65,17 @@ const Navbar = () => {
 
             <div className="hidden md:flex items-center gap-3">
               <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
-                <MapPin className="w-4 h-4 text-primary" />
+                <FiMapPin className="w-4 h-4 text-primary" />
                 <span>Cameroun</span>
               </div>
               
               <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hover:bg-primary/10 hover:text-primary transition-colors">
-                <Search className="w-5 h-5" />
+                <FiSearch className="w-5 h-5" />
               </Button>
-              
-              <Link to="/profile">
-                <Button variant="ghost" size="icon" className="relative hover:bg-secondary/10 hover:text-secondary transition-colors">
-                  <Heart className="w-5 h-5" />
-                  {favCount > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-xs font-bold rounded-full flex items-center justify-center animate-scale-in">
-                      {favCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
               
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative hover:bg-orange/10 hover:text-orange transition-colors">
-                  <ShoppingCart className="w-5 h-5" />
+                  <FiShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-secondary to-orange text-white text-xs font-bold rounded-full flex items-center justify-center animate-scale-in">
                       {cartCount}
@@ -99,9 +84,14 @@ const Navbar = () => {
                 </Button>
               </Link>
               
+              <Link to="/profile">
+                <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-colors">
+                  <FiUser className="w-5 h-5" />
+                </Button>
+              </Link>
+              
               <Link to="/login">
                 <Button variant="default" size="sm" className="gap-2 bg-gradient-to-r from-primary via-secondary to-orange hover:opacity-90 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105">
-                  <User className="w-4 h-4" />
                   Connexion
                 </Button>
               </Link>
@@ -109,10 +99,10 @@ const Navbar = () => {
 
             <div className="flex md:hidden items-center gap-2">
               <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
-                <Search className="w-5 h-5" />
+                <FiSearch className="w-5 h-5" />
               </Button>
               <Link to="/cart" className="relative p-2">
-                <ShoppingCart className="w-6 h-6 text-foreground" />
+                <FiShoppingCart className="w-6 h-6 text-foreground" />
                 {cartCount > 0 && (
                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-secondary to-orange text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {cartCount}
@@ -120,7 +110,7 @@ const Navbar = () => {
                 )}
               </Link>
               <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
-                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
               </Button>
             </div>
           </div>
@@ -144,12 +134,11 @@ const Navbar = () => {
                 ))}
                 <hr className="my-2 border-border" />
                 <Link to="/profile" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-xl text-muted-foreground hover:bg-muted flex items-center gap-2">
-                  <Heart className="w-4 h-4" />
-                  Favoris ({favCount})
+                  <FiUser className="w-4 h-4" />
+                  Mon Profil
                 </Link>
                 <Link to="/login" onClick={() => setIsOpen(false)}>
                   <Button variant="default" className="w-full gap-2 bg-gradient-to-r from-primary via-secondary to-orange text-white">
-                    <User className="w-4 h-4" />
                     Connexion
                   </Button>
                 </Link>
