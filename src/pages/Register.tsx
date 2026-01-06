@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Loader2, User, Phone, Check, Shield, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,28 @@ import BubblesBackground from "@/components/BubblesBackground";
 import AnimatedInput from "@/components/AnimatedInput";
 import { useConfetti } from "@/hooks/useConfetti";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { useAuth } from "@/contexts/AuthContext";
+import { z } from "zod";
+
+const registerSchema = z.object({
+  firstName: z.string().min(2, "Prénom trop court").max(50, "Prénom trop long"),
+  lastName: z.string().min(2, "Nom trop court").max(50, "Nom trop long"),
+  email: z.string().email("Email invalide"),
+  phone: z.string().regex(/^6[5-9]\d{7}$/, "Numéro de téléphone invalide"),
+  password: z.string()
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+    .regex(/[A-Z]/, "Le mot de passe doit contenir une majuscule")
+    .regex(/[0-9]/, "Le mot de passe doit contenir un chiffre"),
+  confirmPassword: z.string(),
+  acceptTerms: z.literal(true, { errorMap: () => ({ message: "Vous devez accepter les conditions" }) }),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Les mots de passe ne correspondent pas",
+  path: ["confirmPassword"],
+});
 
 const Register = () => {
   const navigate = useNavigate();
+  const { signUp, user, isLoading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -28,29 +47,28 @@ const Register = () => {
     acceptTerms: false,
   });
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate("/");
+    }
+  }, [user, authLoading, navigate]);
+
   const validatePhone = (phone: string) => {
     const cleaned = phone.replace(/\D/g, '');
     return cleaned.length === 9 && /^6[5-9]/.test(cleaned);
   };
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const validatePassword = (password: string) => {
-    return password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
-  };
-
   const sendOtp = async () => {
     if (!validatePhone(formData.phone)) {
-      toast({ title: "Erreur", description: "Numero de telephone invalide", variant: "destructive" });
+      toast({ title: "Erreur", description: "Numéro de téléphone invalide", variant: "destructive" });
       return;
     }
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setOtpSent(true);
     setIsLoading(false);
-    toast({ title: "Code OTP envoye", description: `Un code a ete envoye au +237 ${formData.phone}` });
+    toast({ title: "Code OTP envoyé", description: `Un code a été envoyé au +237 ${formData.phone}` });
   };
 
   const verifyOtp = async () => {
@@ -60,10 +78,10 @@ const Register = () => {
     }
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    // Simulate OTP verification (in production, verify with backend)
+    // For demo purposes, accept any 6-digit code or 123456
     if (otp === "123456" || otp.length === 6) {
       setOtpVerified(true);
-      toast({ title: "Telephone verifie", description: "Votre numero a ete verifie avec succes" });
+      toast({ title: "Téléphone vérifié", description: "Votre numéro a été vérifié avec succès" });
     } else {
       toast({ title: "Erreur", description: "Code OTP incorrect", variant: "destructive" });
     }
@@ -73,35 +91,64 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateEmail(formData.email)) {
-      toast({ title: "Erreur", description: "Email invalide", variant: "destructive" });
-      return;
-    }
-
-    if (!validatePassword(formData.password)) {
-      toast({ title: "Erreur", description: "Le mot de passe doit contenir au moins 8 caracteres, une majuscule et un chiffre", variant: "destructive" });
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({ title: "Erreur", description: "Les mots de passe ne correspondent pas", variant: "destructive" });
+    // Validate all fields
+    const validation = registerSchema.safeParse(formData);
+    if (!validation.success) {
+      toast({ 
+        title: "Erreur", 
+        description: validation.error.errors[0].message, 
+        variant: "destructive" 
+      });
       return;
     }
 
     if (!otpVerified) {
-      toast({ title: "Erreur", description: "Veuillez verifier votre numero de telephone", variant: "destructive" });
+      toast({ title: "Erreur", description: "Veuillez vérifier votre numéro de téléphone", variant: "destructive" });
       return;
     }
 
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    const { error } = await signUp(formData.email, formData.password, {
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      phone: formData.phone,
+    });
+
+    if (error) {
+      let errorMessage = "Une erreur est survenue";
+      
+      if (error.message.includes("User already registered")) {
+        errorMessage = "Un compte avec cet email existe déjà";
+      } else if (error.message.includes("Password")) {
+        errorMessage = "Le mot de passe ne respecte pas les critères de sécurité";
+      } else if (error.message.includes("Email")) {
+        errorMessage = "Format d'email invalide";
+      }
+      
+      toast({ 
+        title: "Erreur d'inscription", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
+      setIsLoading(false);
+      return;
+    }
 
     triggerConfetti();
     
-    toast({ title: "Compte cree avec succes", description: "Bienvenue sur VitaDrinks" });
+    toast({ title: "Compte créé avec succès", description: "Bienvenue sur VitaDrinks" });
     setIsLoading(false);
-    navigate("/profile");
+    navigate("/");
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-20 pb-16 flex items-center justify-center relative overflow-hidden">
@@ -111,8 +158,8 @@ const Register = () => {
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-8">
             <Link to="/" className="inline-block"><AnimatedLogo size="xl" /></Link>
-            <h1 className="text-3xl font-bold text-foreground mt-4">Creer un compte</h1>
-            <p className="text-muted-foreground mt-2">Rejoignez la communaute VitaDrinks</p>
+            <h1 className="text-3xl font-bold text-foreground mt-4">Créer un compte</h1>
+            <p className="text-muted-foreground mt-2">Rejoignez la communauté VitaDrinks</p>
           </div>
 
           <div className="flex items-center justify-center gap-4 mb-8">
@@ -126,7 +173,7 @@ const Register = () => {
                   {step > s ? <Check className="w-6 h-6" /> : s}
                 </div>
                 <span className={`text-sm font-medium ${step >= s ? "text-foreground" : "text-muted-foreground"}`}>
-                  {s === 1 ? "Informations" : "Securite"}
+                  {s === 1 ? "Informations" : "Sécurité"}
                 </span>
                 {s < 2 && <div className={`w-10 h-1 rounded-full transition-all duration-500 ${step > s ? "bg-gradient-to-r from-primary to-secondary" : "bg-muted"}`} />}
               </div>
@@ -139,7 +186,7 @@ const Register = () => {
                 <div className="space-y-5 animate-fade-in">
                   <div className="grid grid-cols-2 gap-4">
                     <AnimatedInput 
-                      label="Prenom" 
+                      label="Prénom" 
                       icon={<User className="w-5 h-5" />} 
                       value={formData.firstName} 
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} 
@@ -166,7 +213,7 @@ const Register = () => {
                     <div className="flex gap-2">
                       <div className="flex-1">
                         <AnimatedInput 
-                          label="Telephone" 
+                          label="Téléphone" 
                           icon={<Phone className="w-5 h-5" />} 
                           type="tel" 
                           value={formData.phone} 
@@ -193,7 +240,7 @@ const Register = () => {
                       {otpVerified && (
                         <div className="mt-6 flex items-center gap-2 text-primary">
                           <Shield className="w-5 h-5" />
-                          <span className="text-sm font-medium">Verifie</span>
+                          <span className="text-sm font-medium">Vérifié</span>
                         </div>
                       )}
                     </div>
@@ -202,7 +249,7 @@ const Register = () => {
                       <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 space-y-3 animate-fade-in">
                         <div className="flex items-center gap-2 text-sm font-medium">
                           <Smartphone className="w-4 h-4 text-primary" />
-                          Entrez le code OTP recu
+                          Entrez le code OTP reçu
                         </div>
                         <div className="flex justify-center">
                           <InputOTP maxLength={6} value={otp} onChange={setOtp}>
@@ -220,7 +267,7 @@ const Register = () => {
                           className="w-full bg-gradient-to-r from-primary to-secondary text-white"
                         >
                           {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                          Verifier le code
+                          Vérifier le code
                         </Button>
                         <p className="text-xs text-center text-muted-foreground">Pour le test, utilisez: 123456</p>
                       </div>
@@ -251,7 +298,7 @@ const Register = () => {
                   />
                   <div className="text-xs text-muted-foreground space-y-1 px-1">
                     <p className={formData.password.length >= 8 ? "text-primary" : ""}>
-                      {formData.password.length >= 8 ? "✓" : "○"} Au moins 8 caracteres
+                      {formData.password.length >= 8 ? "✓" : "○"} Au moins 8 caractères
                     </p>
                     <p className={/[A-Z]/.test(formData.password) ? "text-primary" : ""}>
                       {/[A-Z]/.test(formData.password) ? "✓" : "○"} Une majuscule
@@ -278,13 +325,13 @@ const Register = () => {
                       required 
                     />
                     <label htmlFor="terms" className="text-sm text-muted-foreground">
-                      J'accepte les <Link to="/terms" className="text-primary hover:underline font-medium">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline font-medium">politique de confidentialite</Link>
+                      J'accepte les <Link to="/terms" className="text-primary hover:underline font-medium">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline font-medium">politique de confidentialité</Link>
                     </label>
                   </div>
                   <div className="flex gap-3">
                     <Button type="button" size="lg" variant="outline" className="flex-1" onClick={() => setStep(1)}>Retour</Button>
                     <Button type="submit" size="lg" className="flex-1 bg-gradient-to-r from-primary via-secondary to-orange hover:opacity-90 text-white font-semibold" disabled={isLoading || !formData.acceptTerms}>
-                      {isLoading ? (<><Loader2 className="w-5 h-5 animate-spin mr-2" />Creation...</>) : "Creer mon compte"}
+                      {isLoading ? (<><Loader2 className="w-5 h-5 animate-spin mr-2" />Création...</>) : "Créer mon compte"}
                     </Button>
                   </div>
                 </div>
@@ -292,12 +339,12 @@ const Register = () => {
             </form>
 
             <p className="text-center mt-8 text-muted-foreground">
-              Deja un compte? <Link to="/login" className="text-primary font-semibold hover:underline">Se connecter</Link>
+              Déjà un compte? <Link to="/login" className="text-primary font-semibold hover:underline">Se connecter</Link>
             </p>
           </div>
 
           <div className="text-center mt-6">
-            <p className="text-muted-foreground">Vous etes un producteur? <Link to="/seller/register" className="text-secondary font-semibold hover:underline">Inscrivez-vous comme vendeur</Link></p>
+            <p className="text-muted-foreground">Vous êtes un producteur? <Link to="/seller/register" className="text-secondary font-semibold hover:underline">Inscrivez-vous comme vendeur</Link></p>
           </div>
         </div>
       </div>
