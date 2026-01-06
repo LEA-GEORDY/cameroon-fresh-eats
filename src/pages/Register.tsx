@@ -111,7 +111,7 @@ const Register = () => {
         <div className="max-w-lg mx-auto">
           <div className="text-center mb-8">
             <Link to="/" className="inline-block"><AnimatedLogo size="xl" /></Link>
-            <h1 className="font-display text-3xl font-bold text-foreground mt-4">Creer un compte</h1>
+            <h1 className="text-3xl font-bold text-foreground mt-4">Creer un compte</h1>
             <p className="text-muted-foreground mt-2">Rejoignez la communaute VitaDrinks</p>
           </div>
 
@@ -133,7 +133,7 @@ const Register = () => {
             ))}
           </div>
 
-          <div className="bg-card/80 backdrop-blur-2xl rounded-3xl shadow-elevated p-8 border border-border/30">
+          <div className="bg-card/60 backdrop-blur-2xl rounded-3xl shadow-elevated p-8 border border-white/20" style={{ backdropFilter: 'blur(20px)' }}>
             <form onSubmit={handleSubmit} className="space-y-6">
               {step === 1 && (
                 <div className="space-y-5 animate-fade-in">

@@ -6,10 +6,16 @@ import { sellers } from "@/data/products";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import heroBg from "@/assets/hero-bg.jpg";
 
 const Index = () => {
   useEffect(() => {
-    AOS.init({ duration: 800, once: true, easing: "ease-out-cubic" });
+    AOS.init({ 
+      duration: 800, 
+      once: true, 
+      easing: "ease-out-cubic",
+      offset: 50 
+    });
   }, []);
 
   const inspiringPhrases = [
@@ -20,66 +26,111 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        {/* Floating Elements */}
-        <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-1/4 right-1/3 w-48 h-48 bg-secondary/20 rounded-full blur-3xl animate-float-delayed" />
-        <div className="absolute top-1/3 left-1/4 w-24 h-24 bg-orange/20 rounded-full blur-3xl animate-float" />
+      {/* Hero Section - Inspired by BuildMasters design */}
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
+        {/* Decorative shapes */}
+        <div className="absolute top-0 right-0 w-1/2 h-full">
+          <div className="absolute top-20 right-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-40 right-40 w-64 h-64 bg-secondary/15 rounded-full blur-2xl" />
+        </div>
+        
+        {/* Curved decorative element */}
+        <div className="absolute bottom-0 left-0 w-full h-32">
+          <svg viewBox="0 0 1440 120" className="w-full h-full fill-muted/30">
+            <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,80 1440,60 L1440,120 L0,120 Z" />
+          </svg>
+        </div>
 
-        {/* Content */}
         <div className="container relative z-10 mx-auto px-4 pt-24 pb-16">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
-            <div data-aos="fade-up" data-aos-delay="100">
-              <AnimatedLogo size="xl" />
-            </div>
-            
-            <div className="space-y-4" data-aos="fade-up" data-aos-delay="200">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20">
-                Jus 100% Naturels du Cameroun
-              </span>
-              <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-bold text-foreground leading-tight">
-                La Nature dans{" "}
-                <span className="bg-gradient-to-r from-primary via-secondary to-orange bg-clip-text text-transparent">Votre Verre</span>
-              </h1>
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto">
-                {inspiringPhrases[0]}
-              </p>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="space-y-8">
+              <div data-aos="fade-right" data-aos-delay="100">
+                <AnimatedLogo size="lg" />
+              </div>
+              
+              <div className="space-y-6" data-aos="fade-right" data-aos-delay="200">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+                  La <span className="text-primary">Nature</span> dans{" "}
+                  <span className="bg-gradient-to-r from-secondary via-orange to-primary bg-clip-text text-transparent">
+                    Votre Verre
+                  </span>.
+                </h1>
+                <p className="text-lg text-muted-foreground max-w-lg">
+                  {inspiringPhrases[0]}. Decouvrez les meilleurs producteurs de jus naturels du Cameroun.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-4" data-aos="fade-right" data-aos-delay="400">
+                <Link to="/products">
+                  <Button 
+                    size="lg" 
+                    className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-white px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
+                  >
+                    Explorer
+                  </Button>
+                </Link>
+                <Link to="/about">
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    className="px-8 py-6 text-lg rounded-full border-2 hover:bg-muted/50"
+                  >
+                    En Savoir Plus
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Stats - Curved layout */}
+              <div className="flex flex-wrap gap-8 pt-8" data-aos="fade-up" data-aos-delay="600">
+                {[
+                  { value: "100%", label: "Naturel", color: "text-primary" },
+                  { value: "50+", label: "Produits", color: "text-secondary" },
+                  { value: "20+", label: "Vendeurs", color: "text-orange" },
+                ].map((stat, index) => (
+                  <div key={stat.label} className="text-center relative">
+                    <div className="absolute -left-3 top-0 w-1 h-full bg-gradient-to-b from-primary via-secondary to-orange rounded-full opacity-50" style={{ display: index === 0 ? 'block' : 'none' }} />
+                    <p className={`text-3xl sm:text-4xl font-bold ${stat.color}`}>{stat.value}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center" data-aos="fade-up" data-aos-delay="400">
-              <Link to="/products">
-                <Button size="xl" variant="hero" className="group w-full sm:w-auto">
-                  Decouvrir nos Produits
-                  <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button size="xl" variant="hero-outline" className="w-full sm:w-auto">
-                  En Savoir Plus
-                </Button>
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="flex flex-wrap gap-6 sm:gap-8 justify-center pt-8" data-aos="fade-up" data-aos-delay="600">
-              {[
-                { value: "100%", label: "Naturel" },
-                { value: "50+", label: "Produits" },
-                { value: "20+", label: "Vendeurs" },
-                { value: "5K+", label: "Clients" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">{stat.value}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{stat.label}</p>
+            {/* Right Image - Asymmetric with decorative frame */}
+            <div className="relative" data-aos="zoom-out" data-aos-delay="300">
+              {/* Background decorative shape */}
+              <div className="absolute -top-8 -right-8 w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl rotate-3" />
+              
+              {/* Main image container */}
+              <div className="relative bg-card rounded-3xl overflow-hidden shadow-elevated">
+                <img 
+                  src={heroBg} 
+                  alt="Jus naturels frais" 
+                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                />
+                
+                {/* Floating nav on image */}
+                <div className="absolute top-6 left-1/2 -translate-x-1/2 bg-card/90 backdrop-blur-xl rounded-full px-6 py-3 shadow-lg flex gap-6">
+                  <Link to="/" className="text-primary font-medium text-sm">Accueil</Link>
+                  <Link to="/about" className="text-muted-foreground hover:text-foreground text-sm transition-colors">A Propos</Link>
+                  <Link to="/products" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Produits</Link>
                 </div>
-              ))}
+
+                {/* Floating badge */}
+                <div className="absolute bottom-6 right-6 bg-card/95 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                    <span className="text-sm font-medium">5K+ Clients satisfaits</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-gentle">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <div className="w-8 h-12 rounded-full border-2 border-primary/30 flex items-start justify-center pt-2">
             <div className="w-1.5 h-3 bg-primary/50 rounded-full animate-pulse" />
           </div>
@@ -104,8 +155,8 @@ const Index = () => {
                 key={seller.id}
                 to={`/seller/${seller.id}`}
                 className="group"
-                data-aos="fade-up"
-                data-aos-delay={index * 100}
+                data-aos={index % 3 === 0 ? "fade-right" : index % 3 === 1 ? "zoom-in" : "fade-left"}
+                data-aos-delay={index * 80}
               >
                 <div className="bg-card/80 backdrop-blur-xl rounded-2xl shadow-card hover:shadow-elevated transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-border/50">
                   {/* Banner */}
@@ -225,7 +276,7 @@ const Index = () => {
               <div
                 key={testimonial.name}
                 className="p-6 bg-card rounded-2xl shadow-card"
-                data-aos="fade-up"
+                data-aos={index === 0 ? "fade-right" : index === 1 ? "zoom-in" : "fade-left"}
                 data-aos-delay={index * 100}
               >
                 <div className="flex items-center gap-1 mb-4">

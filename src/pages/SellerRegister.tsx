@@ -208,7 +208,7 @@ const SellerRegister = () => {
           )}
 
           {/* Step Content */}
-          <div className="bg-card/80 backdrop-blur-2xl rounded-3xl shadow-elevated p-8 border border-border/30">
+          <div className="bg-card/60 backdrop-blur-2xl rounded-3xl shadow-elevated p-8 border border-white/20" style={{ backdropFilter: 'blur(20px)' }}>
             {/* Step 0: Welcome - Circular Design */}
             {step === 0 && (
               <div className="text-center space-y-8 animate-fade-in">

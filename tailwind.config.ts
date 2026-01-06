@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Poppins", "sans-serif"],
-        display: ["Playfair Display", "serif"],
+        sans: ["'Segoe UI'", "Tahoma", "Geneva", "Verdana", "sans-serif"],
+        display: ["'Segoe UI'", "Tahoma", "Geneva", "Verdana", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
