@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FiArrowRight, FiStar, FiMapPin, FiChevronRight, FiPlay } from "react-icons/fi";
+import { FiArrowRight, FiStar, FiMapPin, FiChevronRight } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import { sellers } from "@/data/products";
+import AnimatedLogo from "@/components/AnimatedLogo";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import HeroCarousel from "@/components/HeroCarousel";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import communityVideo from "@/assets/community-video.mp4";
+import heroBg from "@/assets/hero-bg.jpg";
+import communityBg from "@/assets/community-bg.jpg";
 
 const Index = () => {
   useEffect(() => {
@@ -31,67 +32,48 @@ const Index = () => {
       location: "Douala",
       text: "Les jus sont vraiment frais et delicieux ! La livraison est rapide et le service client excellent.",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
     },
     {
       name: "Jean-Paul M.",
       location: "Yaounde",
       text: "Enfin une plateforme qui met en avant les producteurs locaux. Les smoothies detox sont incroyables !",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
     },
     {
       name: "Aminata D.",
       location: "Bafoussam",
       text: "Qualite exceptionnelle, on sent vraiment la fraicheur des fruits. Je recommande vivement !",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
     },
     {
       name: "Pierre E.",
       location: "Kribi",
       text: "Le Bissap est exactement comme celui de ma grand-mère. Un vrai délice nostalgique !",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
     },
     {
       name: "Fatou N.",
       location: "Garoua",
       text: "Commander est simple et la qualité est toujours au rendez-vous. Mes enfants adorent !",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&crop=face",
     },
     {
       name: "Samuel T.",
       location: "Limbé",
       text: "Les shots au gingembre m'ont changé la vie. Plus d'énergie chaque matin !",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
     },
     {
       name: "Grace O.",
       location: "Bamenda",
       text: "Le service est impeccable et les produits sont 100% naturels. Je suis cliente fidèle !",
       rating: 5,
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
     },
   ];
 
-  // Seller descriptions
-  const sellerDescriptions: { [key: string]: string } = {
-    "seller1": "Jus tropicaux frais pressés chaque matin",
-    "seller2": "Smoothies bio certifiés pour votre bien-être",
-    "seller3": "Recettes africaines authentiques et savoureuses",
-    "seller4": "Shots énergisants au gingembre camerounais",
-    "seller5": "Créations gourmandes au cacao premium",
-    "seller6": "Boissons traditionnelles revisitées avec passion",
-    "seller7": "Fruits exotiques cueillis à la main",
-    "seller8": "Super-aliments africains pour votre santé",
-  };
-
   return (
     <div className="min-h-screen">
-      {/* Hero Section - Clean design with circular carousel */}
+      {/* Hero Section - Clean design without floating nav */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-background">
         {/* Decorative shapes */}
         <div className="absolute top-0 right-0 w-1/2 h-full">
@@ -108,8 +90,12 @@ const Index = () => {
 
         <div className="container relative z-10 mx-auto px-4 pt-24 pb-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content - No logo here */}
+            {/* Left Content */}
             <div className="space-y-8">
+              <div data-aos="fade-right" data-aos-delay="100">
+                <AnimatedLogo size="lg" />
+              </div>
+              
               <div className="space-y-6" data-aos="fade-right" data-aos-delay="200">
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
                   La <span className="text-primary">Nature</span> dans{" "}
@@ -127,7 +113,7 @@ const Index = () => {
                 <Link to="/products">
                   <Button 
                     size="lg" 
-                    className="bg-primary hover:bg-primary/90 text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all font-semibold hover:scale-105"
+                    className="bg-primary hover:bg-primary/90 text-white px-10 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all font-semibold"
                   >
                     Explorer
                   </Button>
@@ -136,7 +122,7 @@ const Index = () => {
                   <Button 
                     size="lg" 
                     variant="outline"
-                    className="px-10 py-6 text-lg rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold hover:scale-105"
+                    className="px-10 py-6 text-lg rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all font-semibold"
                   >
                     En Savoir Plus
                   </Button>
@@ -161,9 +147,27 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right - Circular Carousel */}
-            <div data-aos="zoom-out" data-aos-delay="300">
-              <HeroCarousel />
+            {/* Right Image - Clean without floating nav */}
+            <div className="relative" data-aos="zoom-out" data-aos-delay="300">
+              {/* Background decorative shape */}
+              <div className="absolute -top-8 -right-8 w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl rotate-3" />
+              
+              {/* Main image container - No floating nav overlay */}
+              <div className="relative bg-card rounded-3xl overflow-hidden shadow-elevated">
+                <img 
+                  src={heroBg} 
+                  alt="Jus naturels frais" 
+                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                />
+
+                {/* Floating badge */}
+                <div className="absolute bottom-6 right-6 bg-card/95 backdrop-blur-xl rounded-2xl px-4 py-3 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                    <span className="text-sm font-medium">5K+ Clients satisfaits</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -176,7 +180,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Sellers Section - With animated descriptions */}
+      {/* Sellers Section - Show all 8 with logos */}
       <section className="py-16 sm:py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-12" data-aos="fade-up">
@@ -199,11 +203,11 @@ const Index = () => {
               >
                 <div className="bg-card/80 backdrop-blur-xl rounded-2xl shadow-card hover:shadow-elevated transition-all duration-500 hover:-translate-y-2 overflow-hidden border border-border/50 p-4 text-center">
                   {/* Logo */}
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-2xl overflow-hidden shadow-lg mb-4 bg-gradient-to-r from-primary/20 to-secondary/20 group-hover:scale-110 transition-transform duration-500">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto rounded-2xl overflow-hidden shadow-lg mb-4 bg-gradient-to-r from-primary/20 to-secondary/20">
                     <img 
                       src={seller.logo}
                       alt={seller.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
 
@@ -212,13 +216,8 @@ const Index = () => {
                     {seller.name}
                   </h3>
                   
-                  {/* Animated Description */}
-                  <p className="text-xs text-muted-foreground mt-2 line-clamp-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-fade-in">
-                    {sellerDescriptions[seller.id] || seller.description}
-                  </p>
-                  
                   {/* Location */}
-                  <div className="flex items-center justify-center gap-1 mt-2 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-center gap-1 mt-1 text-xs text-muted-foreground">
                     <FiMapPin className="w-3 h-3" />
                     <span className="line-clamp-1">{seller.location.split(',')[0]}</span>
                   </div>
@@ -235,25 +234,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section with Video Background */}
+      {/* CTA Section with Background Image */}
       <section className="py-16 sm:py-24 relative overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src={communityVideo} type="video/mp4" />
-          </video>
-        </div>
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${communityBg})` }}
+        />
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-secondary/85 to-orange/80" />
         
         <div className="container relative mx-auto px-4 text-center" data-aos="fade-up">
           <div className="max-w-3xl mx-auto space-y-6 sm:space-y-8">
+            <div className="brightness-0 invert flex justify-center">
+              <AnimatedLogo size="lg" />
+            </div>
             <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white">
               Rejoignez la Communaute VitaDrinks
             </h2>
@@ -262,19 +257,12 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button 
-                  size="lg" 
-                  className="w-full sm:w-auto bg-white text-primary hover:bg-white/90 rounded-full px-8 font-semibold transition-all duration-300 hover:scale-110 hover:shadow-2xl animate-pulse"
-                >
+                <Button size="lg" className="w-full sm:w-auto bg-white text-primary hover:bg-white/90 rounded-full px-8 font-semibold">
                   Creer un Compte Client
                 </Button>
               </Link>
               <Link to="/seller/register">
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="w-full sm:w-auto border-2 border-white text-white hover:bg-white/20 rounded-full px-8 font-semibold transition-all duration-300 hover:scale-110 hover:shadow-2xl"
-                >
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-2 border-white text-white hover:bg-white/10 rounded-full px-8 font-semibold">
                   Devenir Vendeur
                 </Button>
               </Link>
@@ -283,7 +271,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials - With photos and animated text */}
+      {/* Testimonials - 7 testimonials */}
       <section className="py-16 sm:py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10 sm:mb-12" data-aos="fade-up">
@@ -299,42 +287,20 @@ const Index = () => {
             {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.name}
-                className="p-6 bg-card rounded-2xl shadow-card hover:shadow-elevated transition-all duration-500 hover:-translate-y-1 group"
+                className="p-6 bg-card rounded-2xl shadow-card"
                 data-aos="fade-up"
                 data-aos-delay={index * 80}
               >
-                {/* Avatar and Info */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-primary/30 group-hover:ring-primary transition-all duration-300">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {testimonial.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{testimonial.location}</p>
-                  </div>
-                </div>
-
-                {/* Stars */}
-                <div className="flex items-center gap-1 mb-3">
+                <div className="flex items-center gap-1 mb-4">
                   {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <FiStar 
-                      key={i} 
-                      className="w-4 h-4 text-accent fill-accent group-hover:scale-110 transition-transform duration-300" 
-                      style={{ transitionDelay: `${i * 50}ms` }}
-                    />
+                    <FiStar key={i} className="w-5 h-5 text-accent fill-accent" />
                   ))}
                 </div>
-
-                {/* Animated Text */}
-                <p className="text-foreground/80 italic text-sm leading-relaxed group-hover:text-foreground transition-colors duration-300">
-                  "{testimonial.text}"
-                </p>
+                <p className="text-foreground mb-4 italic text-sm">"{testimonial.text}"</p>
+                <div>
+                  <p className="font-semibold text-foreground">{testimonial.name}</p>
+                  <p className="text-sm text-muted-foreground">{testimonial.location}</p>
+                </div>
               </div>
             ))}
           </div>
