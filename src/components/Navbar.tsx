@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch, FiMapPin } from "react-icons/fi";
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import { useCart } from "@/contexts/CartContext";
@@ -41,7 +41,11 @@ const Navbar = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link to="/" className="flex items-center gap-2">
-              <AnimatedLogo size="md" />
+              {/* Enhanced animated logo */}
+              <div className="relative">
+                <AnimatedLogo size="md" />
+                <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-secondary/20 to-orange/20 rounded-full blur-lg animate-pulse -z-10" />
+              </div>
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
@@ -64,11 +68,6 @@ const Navbar = () => {
             </div>
 
             <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
-                <FiMapPin className="w-4 h-4 text-primary" />
-                <span>Cameroun</span>
-              </div>
-              
               <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hover:bg-primary/10 hover:text-primary transition-colors">
                 <FiSearch className="w-5 h-5" />
               </Button>
