@@ -1,60 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Bell, ChevronLeft, Package, Tag, MessageCircle, Check, Trash2 } from "lucide-react";
+import { Bell, ChevronLeft, Package, Tag, MessageCircle, Check, Trash2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
+import { formatDistanceToNow } from "date-fns";
+import { fr } from "date-fns/locale";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-interface Notification {
-  id: string;
-  type: "order" | "promo" | "message";
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-}
-
 const Notifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "order",
-      title: "Commande livree",
-      message: "Votre commande CMD-2024-001 a ete livree avec succes.",
-      time: "Il y a 2 heures",
-      read: false
-    },
-    {
-      id: "2",
-      type: "promo",
-      title: "Offre speciale",
-      message: "Profitez de -20% sur tous les smoothies detox ce weekend !",
-      time: "Il y a 5 heures",
-      read: false
-    },
-    {
-      id: "3",
-      type: "message",
-      title: "Nouveau message",
-      message: "Fruits du Soleil vous a envoye un message.",
-      time: "Hier",
-      read: true
-    },
-    {
-      id: "4",
-      type: "order",
-      title: "Commande en preparation",
-      message: "Votre commande CMD-2024-003 est en cours de preparation.",
-      time: "Il y a 2 jours",
-      read: true
-    }
-  ]);
+  const { 
+    notifications, 
+    unreadCount, 
+    isLoading, 
+    markAsRead, 
+    markAllAsRead, 
+    deleteNotification 
+  } = useRealtimeNotifications();
 
   useEffect(() => {
     AOS.init({ duration: 600, once: true });
   }, []);
 
-  const getIcon = (type: string) => {
+  const getIcon = (type: string | null) => {
     switch (type) {
       case "order": return Package;
       case "promo": return Tag;
@@ -63,7 +31,7 @@ const Notifications = () => {
     }
   };
 
-  const getIconColor = (type: string) => {
+  const getIconColor = (type: string | null) => {
     switch (type) {
       case "order": return "bg-primary/10 text-primary";
       case "promo": return "bg-secondary/10 text-secondary";
@@ -72,21 +40,21 @@ const Notifications = () => {
     }
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
+  const formatTime = (dateString: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true, locale: fr });
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-24 pb-16 bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
     );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const deleteNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-  };
-
-  const unreadCount = notifications.filter(n => !n.read).length;
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-background">
@@ -130,7 +98,7 @@ const Notifications = () => {
                 <div 
                   key={notification.id}
                   className={`bg-card rounded-2xl p-4 shadow-card transition-all duration-300 ${
-                    !notification.read ? 'border-l-4 border-primary' : ''
+                    !notification.is_read ? 'border-l-4 border-primary' : ''
                   }`}
                   data-aos="fade-up"
                   data-aos-delay={index * 50}
@@ -142,18 +110,18 @@ const Notifications = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className={`font-semibold ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          <p className={`font-semibold ${!notification.is_read ? 'text-foreground' : 'text-muted-foreground'}`}>
                             {notification.title}
                           </p>
                           <p className="text-sm text-muted-foreground mt-1">
                             {notification.message}
                           </p>
                           <p className="text-xs text-muted-foreground mt-2">
-                            {notification.time}
+                            {formatTime(notification.created_at)}
                           </p>
                         </div>
                         <div className="flex items-center gap-1">
-                          {!notification.read && (
+                          {!notification.is_read && (
                             <Button
                               variant="ghost"
                               size="icon"

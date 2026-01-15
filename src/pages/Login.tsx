@@ -87,88 +87,98 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-16 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
       <BubblesBackground />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-md mx-auto">
+      <div className="relative z-10 w-full max-w-md mx-auto px-4">
+        {/* Glassmorphism Card */}
+        <div 
+          className="relative rounded-[50px] p-10 backdrop-blur-xl"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.2)',
+            border: '1px solid rgba(255,255,255,0.3)',
+          }}
+        >
           <div className="text-center mb-8">
-            <Link to="/" className="inline-block"><AnimatedLogo size="xl" /></Link>
-            <h1 className="text-3xl font-bold text-foreground mt-4">Connexion</h1>
-            <p className="text-muted-foreground mt-2">Heureux de vous revoir</p>
+            <h1 className="text-4xl font-bold text-amber-800">Login</h1>
           </div>
 
-          <div className="bg-card/60 backdrop-blur-2xl rounded-3xl shadow-elevated p-8 border border-white/20" style={{ backdropFilter: 'blur(20px)' }}>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <AnimatedInput 
-                label="Email" 
-                icon={<Mail className="w-5 h-5" />} 
-                type="email" 
-                value={formData.email} 
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-                required 
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email Input */}
+            <div className="relative">
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                placeholder="Email"
+                required
+                className="w-full px-4 py-4 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50 transition-all"
               />
+            </div>
 
-              <div className="relative">
-                <AnimatedInput 
-                  label="Mot de passe" 
-                  icon={<Lock className="w-5 h-5" />} 
-                  type={showPassword ? "text" : "password"} 
-                  value={formData.password} 
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
-                  required 
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-10 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.rememberMe}
-                    onChange={(e) => setFormData({ ...formData, rememberMe: e.target.checked })}
-                    className="w-4 h-4 rounded border-input accent-primary"
-                  />
-                  <span className="text-sm text-muted-foreground">Se souvenir de moi</span>
-                </label>
-                <Link to="/forgot-password" className="text-sm text-primary hover:underline font-medium">
-                  Mot de passe oublié?
-                </Link>
-              </div>
-
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-primary via-secondary to-orange hover:opacity-90 text-white font-semibold"
+            {/* Password Input */}
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                placeholder="Password"
+                required
+                className="w-full px-4 py-4 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50 transition-all pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
               >
-                {isLoading ? (
-                  <><Loader2 className="w-5 h-5 animate-spin mr-2" />Connexion...</>
-                ) : (
-                  "Se connecter"
-                )}
-              </Button>
-            </form>
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
 
-            <p className="text-center mt-8 text-muted-foreground">
-              Pas encore de compte? <Link to="/register" className="text-primary font-semibold hover:underline">Créer un compte</Link>
-            </p>
-          </div>
+            {/* Forgot Password */}
+            <div className="text-right">
+              <Link to="/forgot-password" className="text-sm text-amber-700 hover:text-amber-800 hover:underline">
+                Forget Password?
+              </Link>
+            </div>
 
-          <div className="text-center mt-6 space-y-2">
-            <p className="text-muted-foreground">
-              Vous êtes un vendeur? <Link to="/seller/register" className="text-secondary font-semibold hover:underline">Espace vendeur</Link>
-            </p>
-            <p className="text-muted-foreground">
-              Administrateur? <Link to="/admin/dashboard" className="text-orange font-semibold hover:underline">Espace admin</Link>
-            </p>
-          </div>
+            {/* Login Button */}
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-4 bg-white/90 hover:bg-white text-amber-800 font-semibold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 border border-amber-200/50"
+            >
+              {isLoading ? (
+                <><Loader2 className="w-5 h-5 animate-spin mr-2" />Connexion...</>
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </form>
+
+          <p className="text-center mt-8 text-amber-900/70">
+            Pas encore de compte?{' '}
+            <Link to="/register" className="text-amber-800 font-semibold hover:underline">
+              Créer un compte
+            </Link>
+          </p>
+        </div>
+
+        {/* Footer Links */}
+        <div className="text-center mt-6 space-y-2">
+          <p className="text-amber-900/70">
+            Vous êtes un vendeur?{' '}
+            <Link to="/seller/register" className="text-amber-800 font-semibold hover:underline">
+              Espace vendeur
+            </Link>
+          </p>
+          <p className="text-amber-900/70">
+            Administrateur?{' '}
+            <Link to="/admin/dashboard" className="text-amber-800 font-semibold hover:underline">
+              Espace admin
+            </Link>
+          </p>
         </div>
       </div>
     </div>

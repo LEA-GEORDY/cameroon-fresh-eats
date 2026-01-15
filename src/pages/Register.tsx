@@ -151,201 +151,230 @@ const Register = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-16 flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-10">
       <BubblesBackground />
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-lg mx-auto">
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-block"><AnimatedLogo size="xl" /></Link>
-            <h1 className="text-3xl font-bold text-foreground mt-4">Créer un compte</h1>
-            <p className="text-muted-foreground mt-2">Rejoignez la communauté VitaDrinks</p>
-          </div>
-
-          <div className="flex items-center justify-center gap-4 mb-8">
-            {[1, 2].map((s) => (
-              <div key={s} className="flex items-center gap-2">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold transition-all duration-500 border-2 ${
-                  step >= s 
-                    ? "bg-gradient-to-r from-primary via-secondary to-orange text-white border-transparent shadow-lg" 
-                    : "bg-card text-muted-foreground border-border"
-                }`}>
-                  {step > s ? <Check className="w-6 h-6" /> : s}
-                </div>
-                <span className={`text-sm font-medium ${step >= s ? "text-foreground" : "text-muted-foreground"}`}>
-                  {s === 1 ? "Informations" : "Sécurité"}
-                </span>
-                {s < 2 && <div className={`w-10 h-1 rounded-full transition-all duration-500 ${step > s ? "bg-gradient-to-r from-primary to-secondary" : "bg-muted"}`} />}
+      <div className="relative z-10 w-full max-w-lg mx-auto px-4">
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          {[1, 2].map((s) => (
+            <div key={s} className="flex items-center gap-2">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-500 ${
+                step >= s 
+                  ? "bg-amber-600 text-white shadow-lg" 
+                  : "bg-white/50 text-amber-800"
+              }`}>
+                {step > s ? <Check className="w-5 h-5" /> : s}
               </div>
-            ))}
+              <span className={`text-sm font-medium ${step >= s ? "text-amber-800" : "text-amber-700/60"}`}>
+                {s === 1 ? "Infos" : "Sécurité"}
+              </span>
+              {s < 2 && <div className={`w-8 h-1 rounded-full transition-all duration-500 ${step > s ? "bg-amber-600" : "bg-white/40"}`} />}
+            </div>
+          ))}
+        </div>
+
+        {/* Glassmorphism Card */}
+        <div 
+          className="relative rounded-[40px] p-8 backdrop-blur-xl"
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.2)',
+            border: '1px solid rgba(255,255,255,0.3)',
+          }}
+        >
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-amber-800">Créer un compte</h1>
+            <p className="text-amber-700/70 mt-1">Rejoignez VitaDrinks</p>
           </div>
 
-          <div className="bg-card/60 backdrop-blur-2xl rounded-3xl shadow-elevated p-8 border border-white/20" style={{ backdropFilter: 'blur(20px)' }}>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {step === 1 && (
-                <div className="space-y-5 animate-fade-in">
-                  <div className="grid grid-cols-2 gap-4">
-                    <AnimatedInput 
-                      label="Prénom" 
-                      icon={<User className="w-5 h-5" />} 
-                      value={formData.firstName} 
-                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} 
-                      required 
-                    />
-                    <AnimatedInput 
-                      label="Nom" 
-                      value={formData.lastName} 
-                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} 
-                      required 
-                    />
-                  </div>
-                  <AnimatedInput 
-                    label="Email" 
-                    icon={<Mail className="w-5 h-5" />} 
-                    type="email" 
-                    value={formData.email} 
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-                    required 
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {step === 1 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    placeholder="Prénom"
+                    required
+                    className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
                   />
-                  
-                  {/* Phone with OTP */}
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <AnimatedInput 
-                          label="Téléphone" 
-                          icon={<Phone className="w-5 h-5" />} 
-                          type="tel" 
-                          value={formData.phone} 
-                          onChange={(e) => {
-                            const cleaned = e.target.value.replace(/\D/g, '').slice(0, 9);
-                            setFormData({ ...formData, phone: cleaned });
-                            setOtpVerified(false);
-                            setOtpSent(false);
-                          }} 
-                          required 
-                          disabled={otpVerified}
-                        />
-                      </div>
-                      {!otpVerified && (
-                        <Button 
-                          type="button" 
-                          onClick={sendOtp}
-                          disabled={isLoading || !validatePhone(formData.phone)}
-                          className="mt-6 bg-gradient-to-r from-secondary to-orange text-white"
-                        >
-                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : otpSent ? "Renvoyer" : "Envoyer OTP"}
-                        </Button>
-                      )}
-                      {otpVerified && (
-                        <div className="mt-6 flex items-center gap-2 text-primary">
-                          <Shield className="w-5 h-5" />
-                          <span className="text-sm font-medium">Vérifié</span>
-                        </div>
-                      )}
-                    </div>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    placeholder="Nom"
+                    required
+                    className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                  />
+                </div>
 
-                    {otpSent && !otpVerified && (
-                      <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 space-y-3 animate-fade-in">
-                        <div className="flex items-center gap-2 text-sm font-medium">
-                          <Smartphone className="w-4 h-4 text-primary" />
-                          Entrez le code OTP reçu
-                        </div>
-                        <div className="flex justify-center">
-                          <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                            <InputOTPGroup>
-                              {[0, 1, 2, 3, 4, 5].map((i) => (
-                                <InputOTPSlot key={i} index={i} className="w-12 h-14 text-xl border-2" />
-                              ))}
-                            </InputOTPGroup>
-                          </InputOTP>
-                        </div>
-                        <Button 
-                          type="button" 
-                          onClick={verifyOtp}
-                          disabled={isLoading || otp.length !== 6}
-                          className="w-full bg-gradient-to-r from-primary to-secondary text-white"
-                        >
-                          {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                          Vérifier le code
-                        </Button>
-                        <p className="text-xs text-center text-muted-foreground">Pour le test, utilisez: 123456</p>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="Email"
+                  required
+                  className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                />
+
+                {/* Phone with OTP */}
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => {
+                        const cleaned = e.target.value.replace(/\D/g, '').slice(0, 9);
+                        setFormData({ ...formData, phone: cleaned });
+                        setOtpVerified(false);
+                        setOtpSent(false);
+                      }}
+                      placeholder="Téléphone (6XXXXXXXX)"
+                      required
+                      disabled={otpVerified}
+                      className="flex-1 px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50 disabled:opacity-60"
+                    />
+                    {!otpVerified && (
+                      <Button 
+                        type="button" 
+                        onClick={sendOtp}
+                        disabled={isLoading || !validatePhone(formData.phone)}
+                        className="bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4"
+                      >
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : otpSent ? "Renvoyer" : "OTP"}
+                      </Button>
+                    )}
+                    {otpVerified && (
+                      <div className="flex items-center gap-2 text-green-600 px-3">
+                        <Shield className="w-5 h-5" />
+                        <span className="text-sm font-medium">OK</span>
                       </div>
                     )}
                   </div>
 
+                  {otpSent && !otpVerified && (
+                    <div className="p-4 rounded-xl bg-white/30 border border-white/40 space-y-3 animate-fade-in">
+                      <div className="flex items-center gap-2 text-sm font-medium text-amber-800">
+                        <Smartphone className="w-4 h-4" />
+                        Entrez le code OTP
+                      </div>
+                      <div className="flex justify-center">
+                        <InputOTP maxLength={6} value={otp} onChange={setOtp}>
+                          <InputOTPGroup>
+                            {[0, 1, 2, 3, 4, 5].map((i) => (
+                              <InputOTPSlot key={i} index={i} className="w-10 h-12 text-lg border-2 bg-white/80" />
+                            ))}
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </div>
+                      <Button 
+                        type="button" 
+                        onClick={verifyOtp}
+                        disabled={isLoading || otp.length !== 6}
+                        className="w-full bg-amber-600 hover:bg-amber-700 text-white rounded-lg"
+                      >
+                        {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                        Vérifier
+                      </Button>
+                      <p className="text-xs text-center text-amber-800/60">Test: 123456</p>
+                    </div>
+                  )}
+                </div>
+
+                <Button 
+                  type="button" 
+                  className="w-full py-4 bg-white/90 hover:bg-white text-amber-800 font-semibold rounded-full shadow-lg border border-amber-200/50" 
+                  onClick={() => setStep(2)} 
+                  disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !otpVerified}
+                >
+                  Continuer
+                </Button>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-4 animate-fade-in">
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="Mot de passe"
+                  required
+                  className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                />
+                
+                <div className="text-xs text-amber-800/70 space-y-1 px-1">
+                  <p className={formData.password.length >= 8 ? "text-green-600" : ""}>
+                    {formData.password.length >= 8 ? "✓" : "○"} Au moins 8 caractères
+                  </p>
+                  <p className={/[A-Z]/.test(formData.password) ? "text-green-600" : ""}>
+                    {/[A-Z]/.test(formData.password) ? "✓" : "○"} Une majuscule
+                  </p>
+                  <p className={/[0-9]/.test(formData.password) ? "text-green-600" : ""}>
+                    {/[0-9]/.test(formData.password) ? "✓" : "○"} Un chiffre
+                  </p>
+                </div>
+
+                <input
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  placeholder="Confirmer le mot de passe"
+                  required
+                  className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                />
+
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/30">
+                  <input 
+                    type="checkbox" 
+                    id="terms" 
+                    checked={formData.acceptTerms} 
+                    onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })} 
+                    className="w-5 h-5 mt-0.5 rounded accent-amber-600" 
+                    required 
+                  />
+                  <label htmlFor="terms" className="text-sm text-amber-800/80">
+                    J'accepte les <Link to="/terms" className="text-amber-700 hover:underline font-medium">conditions</Link> et la <Link to="/privacy" className="text-amber-700 hover:underline font-medium">confidentialité</Link>
+                  </label>
+                </div>
+
+                <div className="flex gap-3">
                   <Button 
                     type="button" 
-                    size="lg" 
-                    className="w-full bg-gradient-to-r from-primary via-secondary to-orange hover:opacity-90 text-white font-semibold" 
-                    onClick={() => setStep(2)} 
-                    disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !otpVerified}
+                    variant="outline" 
+                    className="flex-1 bg-white/50 border-white/40 text-amber-800 hover:bg-white/70 rounded-full" 
+                    onClick={() => setStep(1)}
                   >
-                    Continuer
+                    Retour
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1 bg-white/90 hover:bg-white text-amber-800 font-semibold rounded-full shadow-lg border border-amber-200/50" 
+                    disabled={isLoading || !formData.acceptTerms}
+                  >
+                    {isLoading ? (<><Loader2 className="w-5 h-5 animate-spin mr-2" />Création...</>) : "Créer"}
                   </Button>
                 </div>
-              )}
+              </div>
+            )}
+          </form>
 
-              {step === 2 && (
-                <div className="space-y-5 animate-fade-in">
-                  <AnimatedInput 
-                    label="Mot de passe" 
-                    icon={<Lock className="w-5 h-5" />} 
-                    type="password" 
-                    value={formData.password} 
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
-                    required 
-                  />
-                  <div className="text-xs text-muted-foreground space-y-1 px-1">
-                    <p className={formData.password.length >= 8 ? "text-primary" : ""}>
-                      {formData.password.length >= 8 ? "✓" : "○"} Au moins 8 caractères
-                    </p>
-                    <p className={/[A-Z]/.test(formData.password) ? "text-primary" : ""}>
-                      {/[A-Z]/.test(formData.password) ? "✓" : "○"} Une majuscule
-                    </p>
-                    <p className={/[0-9]/.test(formData.password) ? "text-primary" : ""}>
-                      {/[0-9]/.test(formData.password) ? "✓" : "○"} Un chiffre
-                    </p>
-                  </div>
-                  <AnimatedInput 
-                    label="Confirmer le mot de passe" 
-                    icon={<Lock className="w-5 h-5" />} 
-                    type="password" 
-                    value={formData.confirmPassword} 
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} 
-                    required 
-                  />
-                  <div className="flex items-start gap-3 p-4 rounded-xl bg-muted/50">
-                    <input 
-                      type="checkbox" 
-                      id="terms" 
-                      checked={formData.acceptTerms} 
-                      onChange={(e) => setFormData({ ...formData, acceptTerms: e.target.checked })} 
-                      className="w-5 h-5 mt-0.5 rounded border-input accent-primary" 
-                      required 
-                    />
-                    <label htmlFor="terms" className="text-sm text-muted-foreground">
-                      J'accepte les <Link to="/terms" className="text-primary hover:underline font-medium">conditions d'utilisation</Link> et la <Link to="/privacy" className="text-primary hover:underline font-medium">politique de confidentialité</Link>
-                    </label>
-                  </div>
-                  <div className="flex gap-3">
-                    <Button type="button" size="lg" variant="outline" className="flex-1" onClick={() => setStep(1)}>Retour</Button>
-                    <Button type="submit" size="lg" className="flex-1 bg-gradient-to-r from-primary via-secondary to-orange hover:opacity-90 text-white font-semibold" disabled={isLoading || !formData.acceptTerms}>
-                      {isLoading ? (<><Loader2 className="w-5 h-5 animate-spin mr-2" />Création...</>) : "Créer mon compte"}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </form>
+          <p className="text-center mt-6 text-amber-900/70">
+            Déjà un compte?{' '}
+            <Link to="/login" className="text-amber-800 font-semibold hover:underline">Se connecter</Link>
+          </p>
+        </div>
 
-            <p className="text-center mt-8 text-muted-foreground">
-              Déjà un compte? <Link to="/login" className="text-primary font-semibold hover:underline">Se connecter</Link>
-            </p>
-          </div>
-
-          <div className="text-center mt-6">
-            <p className="text-muted-foreground">Vous êtes un producteur? <Link to="/seller/register" className="text-secondary font-semibold hover:underline">Inscrivez-vous comme vendeur</Link></p>
-          </div>
+        {/* Footer */}
+        <div className="text-center mt-6">
+          <p className="text-amber-900/70">
+            Vous êtes un producteur?{' '}
+            <Link to="/seller/register" className="text-amber-800 font-semibold hover:underline">
+              Inscrivez-vous comme vendeur
+            </Link>
+          </p>
         </div>
       </div>
     </div>
