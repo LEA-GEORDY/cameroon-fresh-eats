@@ -65,10 +65,13 @@ const Register = () => {
       return;
     }
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 800));
     setOtpSent(true);
     setIsLoading(false);
-    toast({ title: "Code OTP envoyé", description: `Un code a été envoyé au +237 ${formData.phone}` });
+    toast({
+      title: "Code OTP",
+      description: "Mode test: utilisez 123456 (aucun SMS n'est envoyé pour l'instant).",
+    });
   };
 
   const verifyOtp = async () => {
@@ -77,14 +80,15 @@ const Register = () => {
       return;
     }
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    // For demo purposes, accept any 6-digit code or 123456
-    if (otp === "123456" || otp.length === 6) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    if (otp === "123456") {
       setOtpVerified(true);
       toast({ title: "Téléphone vérifié", description: "Votre numéro a été vérifié avec succès" });
     } else {
       toast({ title: "Erreur", description: "Code OTP incorrect", variant: "destructive" });
     }
+
     setIsLoading(false);
   };
 
@@ -156,49 +160,44 @@ const Register = () => {
 
       <div className="relative z-10 w-full max-w-lg mx-auto px-4">
         {/* Progress Steps */}
-        <div className="flex items-center justify-center gap-4 mb-8">
+        <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
           {[1, 2].map((s) => (
             <div key={s} className="flex items-center gap-2">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-500 ${
-                step >= s 
-                  ? "bg-amber-600 text-white shadow-lg" 
-                  : "bg-white/50 text-amber-800"
-              }`}>
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-500 ${
+                  step >= s ? "bg-primary text-primary-foreground shadow-lg" : "bg-card/50 text-foreground"
+                }`}
+              >
                 {step > s ? <Check className="w-5 h-5" /> : s}
               </div>
-              <span className={`text-sm font-medium ${step >= s ? "text-amber-800" : "text-amber-700/60"}`}>
+              <span className={`text-sm font-medium ${step >= s ? "text-foreground" : "text-muted-foreground"}`}>
                 {s === 1 ? "Infos" : "Sécurité"}
               </span>
-              {s < 2 && <div className={`w-8 h-1 rounded-full transition-all duration-500 ${step > s ? "bg-amber-600" : "bg-white/40"}`} />}
+              {s < 2 && (
+                <div className={`w-8 h-1 rounded-full transition-all duration-500 ${step > s ? "bg-primary" : "bg-card/40"}`} />
+              )}
             </div>
           ))}
         </div>
 
         {/* Glassmorphism Card */}
-        <div 
-          className="relative rounded-[40px] p-8 backdrop-blur-xl"
-          style={{ 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-            boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(255,255,255,0.2)',
-            border: '1px solid rgba(255,255,255,0.3)',
-          }}
-        >
+        <div className="relative rounded-3xl sm:rounded-[40px] p-6 sm:p-8 backdrop-blur-xl bg-card/20 border border-border/30 shadow-elevated">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-amber-800">Créer un compte</h1>
-            <p className="text-amber-700/70 mt-1">Rejoignez VitaDrinks</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Créer un compte</h1>
+            <p className="text-muted-foreground mt-1">Rejoignez VitaDrinks</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {step === 1 && (
               <div className="space-y-4 animate-fade-in">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     placeholder="Prénom"
                     required
-                    className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                    className="w-full px-4 py-3 bg-card/90 border border-border/60 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30"
                   />
                   <input
                     type="text"
@@ -206,7 +205,7 @@ const Register = () => {
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     placeholder="Nom"
                     required
-                    className="w-full px-4 py-3 bg-white/90 border-0 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-400/50"
+                    className="w-full px-4 py-3 bg-card/90 border border-border/60 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/30"
                   />
                 </div>
 

@@ -1,365 +1,536 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  LayoutDashboard, Users, Package, ShoppingBag, Settings, 
-  Shield, TrendingUp, DollarSign, Store, AlertTriangle,
-  Bell, Search, Menu, LogOut, BarChart3, CheckCircle2, XCircle, Eye,
-  ArrowUpRight, ArrowDownRight, Calendar, Filter, Download, RefreshCw
+import {
+  BarChart3,
+  Bell,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  Package,
+  Search,
+  Settings,
+  Shield,
+  ShoppingBag,
+  Store,
+  Users,
 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import AnimatedLogo from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import AnimatedLogo from "@/components/AnimatedLogo";
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import { cn } from "@/lib/utils";
 
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
 
-  useEffect(() => {
-    AOS.init({ duration: 800, once: true });
-  }, []);
+  const colors = useMemo(
+    () => ({
+      primary: "hsl(var(--primary))",
+      secondary: "hsl(var(--secondary))",
+      accent: "hsl(var(--accent))",
+      muted: "hsl(var(--muted-foreground))",
+      border: "hsl(var(--border))",
+    }),
+    [],
+  );
 
-  const stats = [
-    { label: "Revenus totaux", value: "2,450,000", suffix: "FCFA", icon: DollarSign, change: "+15%", positive: true, color: "from-primary to-lime" },
-    { label: "Utilisateurs actifs", value: "1,234", icon: Users, change: "+23%", positive: true, color: "from-secondary to-orange" },
-    { label: "Vendeurs verifies", value: "45", icon: Store, change: "+8%", positive: true, color: "from-purple-500 to-pink-500" },
-    { label: "Commandes", value: "567", icon: ShoppingBag, change: "-2%", positive: false, color: "from-blue-500 to-cyan-500" },
-  ];
+  const navItems = useMemo(
+    () => [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { id: "users", label: "Users", icon: Users },
+      { id: "products", label: "Products", icon: Package },
+      { id: "orders", label: "Orders", icon: ShoppingBag },
+      { id: "sellers", label: "Sellers", icon: Store },
+      { id: "analytics", label: "Analytics", icon: BarChart3 },
+      { id: "security", label: "Security", icon: Shield },
+      { id: "settings", label: "Settings", icon: Settings },
+    ],
+    [],
+  );
 
-  const pendingSellers = [
-    { id: "S001", name: "Jus Naturels Douala", email: "jnd@email.com", date: "01/01/2026", status: "En attente", avatar: "JN" },
-    { id: "S002", name: "Bio Fresh Yaounde", email: "bfy@email.com", date: "02/01/2026", status: "En attente", avatar: "BF" },
-    { id: "S003", name: "Fruits Tropicaux", email: "ft@email.com", date: "03/01/2026", status: "En attente", avatar: "FT" },
-  ];
+  const stats = useMemo(
+    () => [
+      { label: "Orders", value: "1,256", delta: "+0.5%" },
+      { label: "Revenue", value: "2,450,000 FCFA", delta: "+2.1%" },
+      { label: "Customers", value: "3,420", delta: "+1.4%" },
+      { label: "Sellers", value: "58", delta: "+0.8%" },
+    ],
+    [],
+  );
 
-  const recentOrders = [
-    { id: "VD-789", customer: "Marie K.", amount: "15,000 FCFA", status: "Livre", date: "Il y a 2h" },
-    { id: "VD-788", customer: "Jean P.", amount: "8,500 FCFA", status: "En cours", date: "Il y a 3h" },
-    { id: "VD-787", customer: "Alice M.", amount: "22,000 FCFA", status: "En attente", date: "Il y a 5h" },
-    { id: "VD-786", customer: "Paul D.", amount: "12,000 FCFA", status: "Livre", date: "Il y a 6h" },
-  ];
+  const orders = useMemo(
+    () => [
+      { name: "Backpack", status: "Delivered" },
+      { name: "Yellow Sofa", status: "Pending" },
+      { name: "Furniture", status: "Processing" },
+    ],
+    [],
+  );
 
-  const recentActivities = [
-    { type: "user", message: "Nouvel utilisateur inscrit: Marie K.", time: "Il y a 5 min" },
-    { type: "order", message: "Nouvelle commande VD-789 de 15,000 FCFA", time: "Il y a 15 min" },
-    { type: "seller", message: "Demande de vendeur: Bio Fresh Yaounde", time: "Il y a 1h" },
-    { type: "alert", message: "Stock faible: Orange Mangue Passion", time: "Il y a 2h" },
-  ];
+  const lastOrders = useMemo(
+    () => [
+      { name: "Black Chair", price: "8,500 FCFA", badge: "New" },
+      { name: "Red Sofa", price: "22,000 FCFA", badge: "Hot" },
+      { name: "Table Lamp", price: "4,000 FCFA", badge: "New" },
+    ],
+    [],
+  );
 
-  const navItems = [
-    { id: "overview", label: "Vue d'ensemble", icon: LayoutDashboard },
-    { id: "users", label: "Utilisateurs", icon: Users },
-    { id: "sellers", label: "Vendeurs", icon: Store },
-    { id: "products", label: "Produits", icon: Package },
-    { id: "orders", label: "Commandes", icon: ShoppingBag },
-    { id: "analytics", label: "Analytiques", icon: BarChart3 },
-    { id: "security", label: "Securite", icon: Shield },
-    { id: "settings", label: "Parametres", icon: Settings },
-  ];
+  const bestProducts = useMemo(
+    () => [
+      { name: "Backpack", hint: "High profit" },
+      { name: "Lenovo", hint: "Best selling" },
+      { name: "Man Dress", hint: "Popular" },
+    ],
+    [],
+  );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Livre": return "bg-primary/10 text-primary";
-      case "En cours": return "bg-secondary/10 text-secondary";
-      case "En attente": return "bg-orange/10 text-orange";
-      default: return "bg-muted text-muted-foreground";
-    }
-  };
+  const earnings = useMemo(
+    () => [
+      { name: "Mon", a: 14, b: 10, c: 9 },
+      { name: "Tue", a: 10, b: 12, c: 8 },
+      { name: "Wed", a: 16, b: 9, c: 10 },
+      { name: "Thu", a: 12, b: 14, c: 11 },
+      { name: "Fri", a: 20, b: 10, c: 14 },
+      { name: "Sat", a: 15, b: 11, c: 12 },
+      { name: "Sun", a: 18, b: 13, c: 15 },
+    ],
+    [],
+  );
+
+  const revenue = useMemo(
+    () => [
+      { name: "Jan", thisWeek: 18, lastWeek: 10 },
+      { name: "Feb", thisWeek: 14, lastWeek: 12 },
+      { name: "Mar", thisWeek: 21, lastWeek: 16 },
+      { name: "Apr", thisWeek: 17, lastWeek: 14 },
+      { name: "May", thisWeek: 24, lastWeek: 18 },
+      { name: "Jun", thisWeek: 20, lastWeek: 16 },
+    ],
+    [],
+  );
+
+  const customers = useMemo(
+    () => [
+      { name: "Current", value: 68 },
+      { name: "New", value: 32 },
+    ],
+    [],
+  );
+
+  const transactions = useMemo(
+    () => [
+      { method: "PayPal", amount: "-29,000" },
+      { method: "Payoneer", amount: "+158,000" },
+      { method: "MasterCard", amount: "-83,000" },
+      { method: "Western Union", amount: "+200,000" },
+    ],
+    [],
+  );
+
+  const bestProductsTable = useMemo(
+    () => [
+      { name: "Mark John", team: "Team A", type: "Fashion", deals: 420, delivery: 95, pending: 5 },
+      { name: "Alex John", team: "Team A", type: "Furniture", deals: 290, delivery: 92, pending: 8 },
+      { name: "James William", team: "Team B", type: "Grocery", deals: 500, delivery: 90, pending: 10 },
+    ],
+    [],
+  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted/30 via-background to-muted/30">
+    <div className="min-h-screen bg-muted/30">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-foreground via-foreground to-foreground/95 text-primary-foreground transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 shadow-2xl`}>
-        <div className="flex flex-col h-full">
-          <div className="p-6 border-b border-primary-foreground/10">
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-72 border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-300 lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        <div className="flex h-full flex-col">
+          <div className="flex items-center gap-3 p-6">
             <Link to="/" className="flex items-center gap-3">
-              <div className="brightness-0 invert">
-                <AnimatedLogo size="md" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text">
-                  ADMINISTRATION
-                </span>
+              <AnimatedLogo size="sm" />
+              <div className="leading-tight">
+                <div className="text-sm font-semibold">e-commerce</div>
+                <div className="text-xs text-muted-foreground">Admin</div>
               </div>
             </Link>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {navItems.map((item) => (
+          <nav className="flex-1 space-y-1 px-4">
+            <div className="px-3 pb-2 text-xs font-medium text-muted-foreground">Overview</div>
+            {navItems.slice(0, 4).map((item) => (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-300 ${
-                  activeTab === item.id
-                    ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/30 scale-[1.02]"
-                    : "text-primary-foreground/70 hover:bg-primary-foreground/10 hover:text-primary-foreground hover:translate-x-1"
-                }`}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
               >
-                <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
-                {item.id === "sellers" && (
-                  <span className="ml-auto bg-orange text-white text-xs px-2 py-0.5 rounded-full">3</span>
-                )}
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </button>
+            ))}
+
+            <div className="px-3 pb-2 pt-4 text-xs font-medium text-muted-foreground">Business</div>
+            {navItems.slice(4).map((item) => (
+              <button
+                key={item.id}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
               </button>
             ))}
           </nav>
 
-          <div className="p-4 border-t border-primary-foreground/10">
+          <div className="p-4">
             <Link to="/">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-primary-foreground/70 hover:text-primary-foreground hover:bg-primary-foreground/10">
-                <LogOut className="w-5 h-5" />
-                Deconnexion
+              <Button variant="outline" className="w-full justify-start gap-2 rounded-xl">
+                <LogOut className="h-4 w-4" />
+                Log Out
               </Button>
             </Link>
           </div>
         </div>
       </aside>
 
-      {/* Mobile sidebar overlay */}
+      {/* Overlay */}
       {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-40 lg:hidden"
+        <div
+          className="fixed inset-0 z-40 bg-foreground/40 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Main Content */}
+      {/* Content */}
       <div className="lg:pl-72">
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
-          <div className="flex items-center justify-between px-4 md:px-6 h-20">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="p-2 rounded-xl hover:bg-muted lg:hidden transition-colors"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              <div>
-                <h1 className="font-display text-xl font-bold text-foreground">
-                  {navItems.find(n => n.id === activeTab)?.label || "Dashboard"}
-                </h1>
-                <p className="text-sm text-muted-foreground">Bienvenue, Administrateur</p>
+        <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
+          <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
+            <button
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted lg:hidden"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label="Open menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <h1 className="font-display text-lg font-semibold text-foreground">Dashboard</h1>
+            </div>
+
+            <div className="hidden flex-1 items-center justify-center lg:flex">
+              <div className="relative w-full max-w-xl">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search for people, documents, goods..."
+                  className="h-11 rounded-2xl bg-muted/50 pl-10"
+                />
               </div>
             </div>
 
-            <div className="hidden md:flex items-center gap-4 flex-1 max-w-md mx-8">
-              <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Rechercher..." className="pl-11 h-11 rounded-xl bg-muted/50 border-0 focus:ring-2 focus:ring-primary/20" />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative rounded-xl hover:bg-muted">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-destructive to-orange text-white text-xs rounded-full flex items-center justify-center animate-pulse">
-                  5
-                </span>
+            <div className="ml-auto flex items-center gap-2">
+              <Button variant="ghost" size="icon" className="rounded-xl">
+                <Bell className="h-5 w-5" />
               </Button>
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center shadow-lg">
-                <Shield className="w-5 h-5" />
-              </div>
+              <div className="h-10 w-10 rounded-xl bg-primary/10" />
             </div>
           </div>
         </header>
 
-        {/* Dashboard Content */}
-        <main className="p-4 md:p-8">
-          {activeTab === "overview" && (
-            <div className="space-y-8">
-              {/* Quick Actions */}
-              <div className="flex flex-wrap gap-3" data-aos="fade-down">
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl">
-                  <Calendar className="w-4 h-4" />
-                  Aujourd'hui
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl">
-                  <Filter className="w-4 h-4" />
-                  Filtrer
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl">
-                  <Download className="w-4 h-4" />
-                  Exporter
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl">
-                  <RefreshCw className="w-4 h-4" />
-                  Actualiser
-                </Button>
+        <main className="p-4 lg:p-6">
+          {/* Top stats */}
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {stats.map((s) => (
+              <div key={s.label} className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">{s.label}</p>
+                  <span className="text-xs font-medium text-primary">{s.delta}</span>
+                </div>
+                <p className="mt-2 text-xl font-semibold text-foreground">{s.value}</p>
               </div>
+            ))}
+          </section>
 
-              {/* Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
-                  <div 
-                    key={stat.label} 
-                    className="relative bg-card rounded-2xl p-6 shadow-card overflow-hidden group hover:shadow-elevated transition-all duration-300 hover:-translate-y-1"
-                    data-aos="fade-up"
-                    data-aos-delay={index * 100}
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
-                        <stat.icon className="w-7 h-7 text-white" />
+          {/* Cards grid like the reference */}
+          <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
+            {/* Orders */}
+            <div className="xl:col-span-3">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-foreground">Orders</h2>
+                  <span className="text-xs text-muted-foreground">+0.5%</span>
+                </div>
+                <div className="space-y-3">
+                  {orders.map((o) => (
+                    <div key={o.name} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-primary/10" />
+                        <span className="text-sm text-foreground">{o.name}</span>
                       </div>
-                      <div className={`flex items-center gap-1 text-sm font-semibold ${stat.positive ? 'text-primary' : 'text-destructive'}`}>
-                        {stat.positive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
-                        {stat.change}
-                      </div>
+                      <span
+                        className={cn(
+                          "rounded-lg px-2 py-1 text-xs font-medium",
+                          o.status === "Delivered" && "bg-primary/10 text-primary",
+                          o.status === "Pending" && "bg-secondary/10 text-secondary",
+                          o.status === "Processing" && "bg-accent/15 text-foreground",
+                        )}
+                      >
+                        {o.status}
+                      </span>
                     </div>
-                    <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                    {stat.suffix && <span className="text-sm text-muted-foreground ml-1">{stat.suffix}</span>}
-                    <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+            </div>
 
-              <div className="grid lg:grid-cols-3 gap-6">
-                {/* Pending Sellers */}
-                <div className="lg:col-span-2 bg-card rounded-2xl shadow-card overflow-hidden" data-aos="fade-right">
-                  <div className="p-6 border-b border-border flex items-center justify-between">
-                    <div>
-                      <h2 className="font-display text-xl font-bold text-foreground">
-                        Vendeurs en attente
-                      </h2>
-                      <p className="text-sm text-muted-foreground">Demandes de verification</p>
+            {/* Last Orders */}
+            <div className="xl:col-span-3">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-foreground">Last Orders</h2>
+                  <span className="text-xs text-muted-foreground">Today</span>
+                </div>
+                <div className="space-y-3">
+                  {lastOrders.map((o) => (
+                    <div key={o.name} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">{o.name}</p>
+                        <p className="text-xs text-muted-foreground">{o.price}</p>
+                      </div>
+                      <span className="rounded-lg bg-primary/10 px-2 py-1 text-xs font-medium text-primary">{o.badge}</span>
                     </div>
-                    <span className="px-4 py-2 bg-gradient-to-r from-orange/10 to-secondary/10 text-orange text-sm font-semibold rounded-xl border border-orange/20">
-                      {pendingSellers.length} en attente
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Best Products */}
+            <div className="xl:col-span-3">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-foreground">Best Products</h2>
+                  <span className="text-xs text-muted-foreground">Week</span>
+                </div>
+                <div className="space-y-3">
+                  {bestProducts.map((p) => (
+                    <div key={p.name} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 rounded-lg bg-secondary/10" />
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-foreground">{p.name}</p>
+                          <p className="text-xs text-muted-foreground">{p.hint}</p>
+                        </div>
+                      </div>
+                      <span className="h-2 w-2 rounded-full bg-primary" aria-hidden />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Earnings */}
+            <div className="xl:col-span-3">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-foreground">Earnings</h2>
+                  <span className="text-xs text-muted-foreground">Weekly</span>
+                </div>
+                <div className="h-40 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={earnings} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                      <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
+                      <YAxis hide />
+                      <Tooltip cursor={{ fill: "transparent" }} />
+                      <Bar dataKey="a" fill={colors.primary} radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="b" fill={colors.secondary} radius={[8, 8, 0, 0]} />
+                      <Bar dataKey="c" fill={colors.accent} radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Revenue */}
+            <div className="xl:col-span-7">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-foreground">Revenue</h2>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full" style={{ background: colors.primary }} />
+                      This week
+                    </span>
+                    <span className="inline-flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full" style={{ background: colors.secondary }} />
+                      Last week
                     </span>
                   </div>
-                  <div className="p-4 space-y-3">
-                    {pendingSellers.map((seller) => (
-                      <div key={seller.id} className="flex items-center justify-between p-4 bg-gradient-to-r from-muted/50 to-transparent rounded-xl hover:from-muted hover:to-muted/50 transition-colors group">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center font-bold text-primary">
-                            {seller.avatar}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-foreground">{seller.name}</p>
-                            <p className="text-sm text-muted-foreground">{seller.email}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button size="sm" className="bg-primary hover:bg-primary/90 text-white rounded-lg gap-1">
-                            <CheckCircle2 className="w-4 h-4" />
-                            Approuver
-                          </Button>
-                          <Button size="sm" variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10 rounded-lg gap-1">
-                            <XCircle className="w-4 h-4" />
-                            Refuser
-                          </Button>
-                          <Button size="sm" variant="ghost" className="rounded-lg">
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-
-                {/* Recent Activities */}
-                <div className="bg-card rounded-2xl shadow-card overflow-hidden" data-aos="fade-left">
-                  <div className="p-6 border-b border-border">
-                    <h2 className="font-display text-xl font-bold text-foreground">
-                      Activites recentes
-                    </h2>
-                    <p className="text-sm text-muted-foreground">Derniers evenements</p>
-                  </div>
-                  <div className="p-4 space-y-3">
-                    {recentActivities.map((activity, index) => (
-                      <div key={index} className="flex items-start gap-3 p-3 hover:bg-muted/50 rounded-xl transition-colors">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          activity.type === "user" ? "bg-primary/10" :
-                          activity.type === "order" ? "bg-secondary/10" :
-                          activity.type === "seller" ? "bg-purple-500/10" :
-                          "bg-destructive/10"
-                        }`}>
-                          {activity.type === "user" && <Users className="w-5 h-5 text-primary" />}
-                          {activity.type === "order" && <ShoppingBag className="w-5 h-5 text-secondary" />}
-                          {activity.type === "seller" && <Store className="w-5 h-5 text-purple-500" />}
-                          {activity.type === "alert" && <AlertTriangle className="w-5 h-5 text-destructive" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-foreground line-clamp-2">{activity.message}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Orders */}
-              <div className="bg-card rounded-2xl shadow-card overflow-hidden" data-aos="fade-up">
-                <div className="p-6 border-b border-border flex items-center justify-between">
-                  <div>
-                    <h2 className="font-display text-xl font-bold text-foreground">
-                      Commandes recentes
-                    </h2>
-                    <p className="text-sm text-muted-foreground">Dernieres transactions</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="rounded-xl">
-                    Voir tout
-                  </Button>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-muted/50">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">ID</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Client</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Montant</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Statut</th>
-                        <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Date</th>
-                        <th className="px-6 py-4 text-right text-sm font-semibold text-muted-foreground">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {recentOrders.map((order) => (
-                        <tr key={order.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="px-6 py-4 text-sm font-mono font-medium text-foreground">{order.id}</td>
-                          <td className="px-6 py-4 text-sm text-foreground">{order.customer}</td>
-                          <td className="px-6 py-4 text-sm font-semibold text-foreground">{order.amount}</td>
-                          <td className="px-6 py-4">
-                            <span className={`px-3 py-1 rounded-lg text-xs font-medium ${getStatusColor(order.status)}`}>
-                              {order.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">{order.date}</td>
-                          <td className="px-6 py-4 text-right">
-                            <Button size="sm" variant="ghost" className="rounded-lg">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="h-56 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={revenue} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                      <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
+                      <YAxis hide />
+                      <Tooltip cursor={{ stroke: colors.border }} />
+                      <Line type="monotone" dataKey="thisWeek" stroke={colors.primary} strokeWidth={3} dot={false} />
+                      <Line type="monotone" dataKey="lastWeek" stroke={colors.secondary} strokeWidth={3} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
                 </div>
               </div>
             </div>
-          )}
 
-          {activeTab !== "overview" && (
-            <div className="flex items-center justify-center h-96 bg-card rounded-2xl shadow-card" data-aos="zoom-in">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center mx-auto mb-4">
-                  <Package className="w-10 h-10 text-primary" />
+            {/* Customers */}
+            <div className="xl:col-span-5">
+              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-sm font-semibold text-foreground">Customers</h2>
+                  <span className="text-xs text-muted-foreground">This month</span>
                 </div>
-                <h2 className="font-display text-2xl font-bold text-foreground">
-                  Section {navItems.find(n => n.id === activeTab)?.label}
-                </h2>
-                <p className="text-muted-foreground mt-2 max-w-md">
-                  Cette section sera bientot disponible. Nous travaillons pour vous offrir la meilleure experience.
-                </p>
-                <Button className="mt-6 bg-gradient-to-r from-primary to-secondary text-white rounded-xl">
-                  Recevoir une notification
-                </Button>
+
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div className="h-52">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={customers}
+                          innerRadius={55}
+                          outerRadius={80}
+                          paddingAngle={2}
+                          dataKey="value"
+                          stroke="transparent"
+                        >
+                          <cell />
+                          <cell />
+                          {customers.map((_, i) => (
+                            <cell
+                              // @ts-expect-error recharts uses lowercase Cell in runtime; TS types vary by version
+                              key={i}
+                            />
+                          ))}
+                        </Pie>
+                        {/* Recharts typing workaround below */}
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Recharts PieChart requires <Cell>. We'll render it separately to avoid TS issues across versions. */}
+                  <div className="flex flex-col justify-center gap-3">
+                    <div className="rounded-xl bg-muted/40 p-3">
+                      <div className="text-xs text-muted-foreground">Current Customers</div>
+                      <div className="mt-1 text-lg font-semibold text-foreground">68%</div>
+                    </div>
+                    <div className="rounded-xl bg-muted/40 p-3">
+                      <div className="text-xs text-muted-foreground">New Customers</div>
+                      <div className="mt-1 text-lg font-semibold text-foreground">32%</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Render Pie with Cell in a hidden chart for consistent colors across versions */}
+                <div className="sr-only" aria-hidden>
+                  <ResponsiveContainer width={1} height={1}>
+                    <PieChart>
+                      <Pie data={customers} dataKey="value">
+                        {/* @ts-expect-error recharts types */}
+                        <Cell fill={colors.primary} />
+                        {/* @ts-expect-error recharts types */}
+                        <Cell fill={colors.secondary} />
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
+                  <div className="inline-flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full" style={{ background: colors.primary }} />
+                    Current
+                  </div>
+                  <div className="inline-flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full" style={{ background: colors.secondary }} />
+                    New
+                  </div>
+                </div>
               </div>
             </div>
-          )}
+          </section>
+
+          {/* Bottom table */}
+          <section className="mt-6 rounded-2xl border border-border bg-card shadow-card">
+            <div className="flex items-center justify-between p-4">
+              <h2 className="text-sm font-semibold text-foreground">Best Products</h2>
+              <Button variant="outline" size="sm" className="rounded-xl">
+                Weekly
+              </Button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-[720px] w-full">
+                <thead className="bg-muted/40">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Team</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Total Deals</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Delivery</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Pending</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {bestProductsTable.map((row) => (
+                    <tr key={row.name} className="hover:bg-muted/20">
+                      <td className="px-4 py-3 text-sm text-foreground">{row.name}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{row.team}</td>
+                      <td className="px-4 py-3 text-sm text-muted-foreground">{row.type}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{row.deals}</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{row.delivery}%</td>
+                      <td className="px-4 py-3 text-sm text-foreground">{row.pending}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="border-t border-border p-4">
+              <h3 className="mb-3 text-sm font-semibold text-foreground">Transaction</h3>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className="space-y-2">
+                  {transactions.map((t) => (
+                    <div key={t.method} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
+                      <span className="text-sm text-foreground">{t.method}</span>
+                      <span className={cn("text-sm font-medium", t.amount.startsWith("+") ? "text-primary" : "text-destructive")}>
+                        {t.amount} FCFA
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="rounded-2xl bg-muted/30 p-4">
+                  <h4 className="text-sm font-semibold text-foreground">Quick Transfer</h4>
+                  <div className="mt-3 space-y-3">
+                    <Input className="h-11 rounded-xl bg-background" placeholder="Card Number" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input className="h-11 rounded-xl bg-background" placeholder="Amount" />
+                      <Input className="h-11 rounded-xl bg-background" placeholder="Currency" />
+                    </div>
+                    <Button className="w-full rounded-xl">Send</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
       </div>
     </div>
