@@ -2,31 +2,31 @@ import { useMemo } from 'react';
 
 const BubblesBackground = () => {
   const bubbles = useMemo(() => {
+    // Warm golden/orange spheres like the reference image
     const colors = [
-      'hsl(142 70% 45%)',      // primary green
-      'hsl(32 95% 55%)',       // secondary orange
-      'hsl(25 100% 50%)',      // orange
-      'hsl(85 70% 50%)',       // lime
-      'hsl(340 75% 55%)',      // berry
-      'hsl(45 100% 50%)',      // accent yellow
-      'hsl(200 80% 50%)',      // blue
-      'hsl(280 70% 60%)',      // purple
-      'hsl(170 70% 45%)',      // teal
+      'hsl(38 90% 55%)',       // golden
+      'hsl(32 95% 60%)',       // orange
+      'hsl(42 100% 65%)',      // light gold
+      'hsl(28 90% 50%)',       // deep orange
+      'hsl(45 100% 70%)',      // bright yellow
+      'hsl(35 85% 58%)',       // amber
     ];
     
-    return Array.from({ length: 30 }, (_, i) => ({
+    return Array.from({ length: 20 }, (_, i) => ({
       id: i,
-      size: Math.random() * 150 + 80,
+      size: Math.random() * 200 + 100, // Bigger bubbles: 100-300px
       left: Math.random() * 100,
-      delay: Math.random() * 10,
-      duration: Math.random() * 12 + 10,
+      top: Math.random() * 100,
+      delay: Math.random() * 5,
+      duration: Math.random() * 8 + 12,
       color: colors[Math.floor(Math.random() * colors.length)],
-      opacity: Math.random() * 0.3 + 0.7, // Higher opacity: 0.7 - 1.0
+      opacity: Math.random() * 0.3 + 0.7,
+      zIndex: Math.floor(Math.random() * 3),
     }));
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" style={{ background: 'linear-gradient(135deg, hsl(42 30% 75%) 0%, hsl(38 35% 70%) 50%, hsl(35 25% 65%) 100%)' }}>
       {bubbles.map((bubble) => (
         <div
           key={bubble.id}
@@ -35,30 +35,38 @@ const BubblesBackground = () => {
             width: bubble.size,
             height: bubble.size,
             left: `${bubble.left}%`,
-            bottom: '-200px',
-            background: `radial-gradient(circle at 30% 30%, ${bubble.color}, ${bubble.color}90 50%, transparent 70%)`,
+            top: `${bubble.top}%`,
+            transform: 'translate(-50%, -50%)',
+            background: `
+              radial-gradient(circle at 30% 30%, 
+                hsl(45 100% 90%) 0%, 
+                ${bubble.color} 40%, 
+                hsl(30 70% 35%) 100%)
+            `,
             opacity: bubble.opacity,
-            animation: `bubbleRise ${bubble.duration}s ease-in-out ${bubble.delay}s infinite`,
-            boxShadow: `0 0 40px ${bubble.color}70, inset 0 0 30px ${bubble.color}50`,
-            filter: 'blur(1px)',
+            animation: `sphereFloat ${bubble.duration}s ease-in-out ${bubble.delay}s infinite`,
+            boxShadow: `
+              inset -20px -20px 40px rgba(0,0,0,0.15),
+              inset 20px 20px 40px rgba(255,255,255,0.5),
+              0 30px 60px rgba(0,0,0,0.15)
+            `,
+            zIndex: bubble.zIndex,
           }}
         />
       ))}
       <style>{`
-        @keyframes bubbleRise {
-          0% { 
-            opacity: 0; 
-            transform: translateY(0) scale(0.5) rotate(0deg); 
+        @keyframes sphereFloat {
+          0%, 100% { 
+            transform: translate(-50%, -50%) translateY(0px) scale(1);
           }
-          10% { 
-            opacity: 1; 
+          25% {
+            transform: translate(-50%, -50%) translateY(-30px) scale(1.02);
           }
-          50% {
-            transform: translateY(-50vh) scale(1.2) rotate(180deg);
+          50% { 
+            transform: translate(-50%, -50%) translateY(-10px) scale(0.98);
           }
-          100% { 
-            opacity: 0; 
-            transform: translateY(-120vh) scale(1) rotate(360deg); 
+          75% {
+            transform: translate(-50%, -50%) translateY(-40px) scale(1.01);
           }
         }
       `}</style>
