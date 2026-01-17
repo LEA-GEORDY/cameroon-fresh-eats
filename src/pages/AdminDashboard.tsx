@@ -18,6 +18,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Line,
   LineChart,
   Pie,
@@ -125,8 +126,8 @@ const AdminDashboard = () => {
 
   const customers = useMemo(
     () => [
-      { name: "Current", value: 68 },
-      { name: "New", value: 32 },
+      { name: "Current", value: 68, color: "hsl(var(--primary))" },
+      { name: "New", value: 32, color: "hsl(var(--secondary))" },
     ],
     [],
   );
@@ -413,13 +414,8 @@ const AdminDashboard = () => {
                           dataKey="value"
                           stroke="transparent"
                         >
-                          <cell />
-                          <cell />
-                          {customers.map((_, i) => (
-                            <cell
-                              // @ts-expect-error recharts uses lowercase Cell in runtime; TS types vary by version
-                              key={i}
-                            />
+                          {customers.map((entry, i) => (
+                            <Cell key={i} fill={entry.color} />
                           ))}
                         </Pie>
                         {/* Recharts typing workaround below */}
@@ -445,9 +441,7 @@ const AdminDashboard = () => {
                   <ResponsiveContainer width={1} height={1}>
                     <PieChart>
                       <Pie data={customers} dataKey="value">
-                        {/* @ts-expect-error recharts types */}
                         <Cell fill={colors.primary} />
-                        {/* @ts-expect-error recharts types */}
                         <Cell fill={colors.secondary} />
                       </Pie>
                     </PieChart>
