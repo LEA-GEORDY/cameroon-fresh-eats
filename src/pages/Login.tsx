@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Loader2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import AnimatedLogo from "@/components/AnimatedLogo";
 import BubblesBackground from "@/components/BubblesBackground";
-import AnimatedInput from "@/components/AnimatedInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { z } from "zod";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const loginSchema = z.object({
   email: z.string().email("Email invalide"),
@@ -24,6 +23,23 @@ const Login = () => {
     password: "",
     rememberMe: false,
   });
+
+  // Load saved credentials on mount
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem("vitadrinks_remember");
+    if (savedCredentials) {
+      try {
+        const parsed = JSON.parse(savedCredentials);
+        setFormData({
+          email: parsed.email || "",
+          password: parsed.password || "",
+          rememberMe: true,
+        });
+      } catch (e) {
+        localStorage.removeItem("vitadrinks_remember");
+      }
+    }
+  }, []);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -69,6 +85,16 @@ const Login = () => {
       setIsLoading(false);
       return;
     }
+
+    // Save or remove credentials based on remember me
+    if (formData.rememberMe) {
+      localStorage.setItem("vitadrinks_remember", JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }));
+    } else {
+      localStorage.removeItem("vitadrinks_remember");
+    }
     
     toast({ 
       title: "Connexion réussie", 
@@ -88,7 +114,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      <BubblesBackground />
+      <BubblesBackground intensity="high" />
 
         <div className="relative z-10 w-full max-w-md mx-auto px-4">
           {/* Glassmorphism Card */}
@@ -130,9 +156,23 @@ const Login = () => {
                 </button>
               </div>
 
-              {/* Forgot Password */}
-              <div className="text-right">
-                <Link to="/forgot-password" className="text-sm text-primary hover:underline">
+              {/* Remember me & Forgot Password */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="rememberMe" 
+                    checked={formData.rememberMe}
+                    onCheckedChange={(checked) => setFormData({ ...formData, rememberMe: checked as boolean })}
+                    className="border-foreground/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                  <label 
+                    htmlFor="rememberMe" 
+                    className="text-sm text-foreground cursor-pointer select-none"
+                  >
+                    Se souvenir de moi
+                  </label>
+                </div>
+                <Link to="/forgot-password" className="text-sm text-foreground font-medium hover:underline">
                   Mot de passe oublié ?
                 </Link>
               </div>
@@ -154,9 +194,9 @@ const Login = () => {
               </Button>
             </form>
 
-            <p className="text-center mt-8 text-muted-foreground">
+            <p className="text-center mt-8 text-foreground">
               Pas encore de compte ?{" "}
-              <Link to="/register" className="text-primary font-semibold hover:underline">
+              <Link to="/register" className="text-foreground font-bold hover:underline">
                 Créer un compte
               </Link>
             </p>
