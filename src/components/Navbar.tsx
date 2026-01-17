@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch, FiMapPin } from "react-icons/fi";
+import { FiShoppingCart, FiUser, FiMenu, FiX, FiSearch } from "react-icons/fi";
 import { Button } from "@/components/ui/button";
 import AnimatedLogo from "@/components/AnimatedLogo";
 import { useCart } from "@/contexts/CartContext";
 import SearchModal from "@/components/SearchModal";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,8 +41,13 @@ const Navbar = () => {
       }`}>
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16 md:h-20">
-            <Link to="/" className="flex items-center gap-2">
-              <AnimatedLogo size="md" />
+            <Link to="/" className="flex items-center gap-2 group">
+              <div className="relative">
+                {/* Enhanced logo animation */}
+                <div className="absolute -inset-3 bg-gradient-to-r from-primary/30 via-secondary/30 to-orange/30 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition-all duration-500 animate-pulse" />
+                <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 animate-spin" style={{ animationDuration: "3s" }} />
+                <AnimatedLogo size="md" />
+              </div>
             </Link>
 
             <div className="hidden md:flex items-center gap-8">
@@ -64,10 +70,8 @@ const Navbar = () => {
             </div>
 
             <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
-                <FiMapPin className="w-4 h-4 text-primary" />
-                <span>Cameroun</span>
-              </div>
+              {/* Language Selector instead of Location */}
+              <LanguageSelector />
               
               <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hover:bg-primary/10 hover:text-primary transition-colors">
                 <FiSearch className="w-5 h-5" />
@@ -133,6 +137,9 @@ const Navbar = () => {
                   </Link>
                 ))}
                 <hr className="my-2 border-border" />
+                <div className="px-4 py-2">
+                  <LanguageSelector />
+                </div>
                 <Link to="/profile" onClick={() => setIsOpen(false)} className="px-4 py-3 rounded-xl text-muted-foreground hover:bg-muted flex items-center gap-2">
                   <FiUser className="w-4 h-4" />
                   Mon Profil
