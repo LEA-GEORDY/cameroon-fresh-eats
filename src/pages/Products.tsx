@@ -94,19 +94,20 @@ const Products = () => {
             </div>
           </div>
 
-          {/* Categories */}
-          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border">
-            {categories.map((category) => (
+          {/* Categories - Professional Design without emojis */}
+          <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-border">
+            {categories.map((category, index) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                data-aos="fade-up"
+                data-aos-delay={index * 50}
+                className={`px-6 py-3 rounded-2xl text-sm font-semibold transition-all duration-300 border-2 ${
                   selectedCategory === category.id
-                    ? "bg-primary text-primary-foreground shadow-soft"
-                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    ? "bg-gradient-to-r from-primary to-secondary text-white border-transparent shadow-lg scale-105"
+                    : "bg-card text-foreground border-border hover:border-primary hover:shadow-md"
                 }`}
               >
-                <span className="mr-2">{category.icon}</span>
                 {category.name}
               </button>
             ))}
