@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   BarChart3,
@@ -13,6 +13,9 @@ import {
   ShoppingBag,
   Store,
   Users,
+  DollarSign,
+  TrendingUp,
+  Percent,
 } from "lucide-react";
 import {
   Bar,
@@ -33,15 +36,61 @@ import AnimatedLogo from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import noDataImg from "@/assets/empty-states/no-data.png";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("dashboard");
+
+  useEffect(() => {
+    AOS.init({ duration: 600, once: true, easing: "ease-out-cubic" });
+  }, []);
+
+  // Animated counters
+  const [animatedStats, setAnimatedStats] = useState({
+    orders: 0,
+    revenue: 0,
+    customers: 0,
+    sellers: 0,
+    commission: 0,
+    bottles: 0,
+  });
+
+  useEffect(() => {
+    const targets = { orders: 1256, revenue: 2450000, customers: 3420, sellers: 58, commission: 24500, bottles: 8750 };
+    const duration = 2000;
+    const steps = 60;
+    const stepDuration = duration / steps;
+
+    let currentStep = 0;
+    const interval = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+
+      setAnimatedStats({
+        orders: Math.floor(targets.orders * easeOut),
+        revenue: Math.floor(targets.revenue * easeOut),
+        customers: Math.floor(targets.customers * easeOut),
+        sellers: Math.floor(targets.sellers * easeOut),
+        commission: Math.floor(targets.commission * easeOut),
+        bottles: Math.floor(targets.bottles * easeOut),
+      });
+
+      if (currentStep >= steps) clearInterval(interval);
+    }, stepDuration);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const colors = useMemo(
     () => ({
       primary: "hsl(var(--primary))",
       secondary: "hsl(var(--secondary))",
       accent: "hsl(var(--accent))",
+      orange: "hsl(var(--orange))",
       muted: "hsl(var(--muted-foreground))",
       border: "hsl(var(--border))",
     }),
@@ -51,105 +100,87 @@ const AdminDashboard = () => {
   const navItems = useMemo(
     () => [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { id: "users", label: "Users", icon: Users },
-      { id: "products", label: "Products", icon: Package },
-      { id: "orders", label: "Orders", icon: ShoppingBag },
-      { id: "sellers", label: "Sellers", icon: Store },
-      { id: "analytics", label: "Analytics", icon: BarChart3 },
-      { id: "security", label: "Security", icon: Shield },
-      { id: "settings", label: "Settings", icon: Settings },
+      { id: "users", label: "Utilisateurs", icon: Users },
+      { id: "products", label: "Produits", icon: Package },
+      { id: "orders", label: "Commandes", icon: ShoppingBag },
+      { id: "sellers", label: "Vendeurs", icon: Store },
+      { id: "analytics", label: "Statistiques", icon: BarChart3 },
+      { id: "security", label: "Securite", icon: Shield },
+      { id: "settings", label: "Parametres", icon: Settings },
     ],
     [],
   );
 
-  const stats = useMemo(
+  const recentOrders = useMemo(
     () => [
-      { label: "Orders", value: "1,256", delta: "+0.5%" },
-      { label: "Revenue", value: "2,450,000 FCFA", delta: "+2.1%" },
-      { label: "Customers", value: "3,420", delta: "+1.4%" },
-      { label: "Sellers", value: "58", delta: "+0.8%" },
+      { id: "CMD-1001", product: "Orange Mangue x5", status: "Livre", amount: "4,000 FCFA" },
+      { id: "CMD-1002", product: "Detox Vert x3", status: "En cours", amount: "2,850 FCFA" },
+      { id: "CMD-1003", product: "Tropical x2", status: "En attente", amount: "1,500 FCFA" },
     ],
     [],
   );
 
-  const orders = useMemo(
+  const topSellers = useMemo(
     () => [
-      { name: "Backpack", status: "Delivered" },
-      { name: "Yellow Sofa", status: "Pending" },
-      { name: "Furniture", status: "Processing" },
+      { name: "Fruits du Soleil", sales: 420, revenue: "336,000 FCFA" },
+      { name: "Bio Nature Plus", sales: 290, revenue: "275,500 FCFA" },
+      { name: "Saveurs d'Afrique", sales: 180, revenue: "144,000 FCFA" },
     ],
     [],
   );
 
-  const lastOrders = useMemo(
+  const topProducts = useMemo(
     () => [
-      { name: "Black Chair", price: "8,500 FCFA", badge: "New" },
-      { name: "Red Sofa", price: "22,000 FCFA", badge: "Hot" },
-      { name: "Table Lamp", price: "4,000 FCFA", badge: "New" },
+      { name: "Orange Mangue Passion", bottles: 1250, profit: "High" },
+      { name: "Detox Vert Energie", bottles: 980, profit: "Medium" },
+      { name: "Tropical Paradise", bottles: 750, profit: "High" },
     ],
     [],
   );
 
-  const bestProducts = useMemo(
+  const salesData = useMemo(
     () => [
-      { name: "Backpack", hint: "High profit" },
-      { name: "Lenovo", hint: "Best selling" },
-      { name: "Man Dress", hint: "Popular" },
+      { name: "Lun", jus: 140, smoothies: 100, detox: 80 },
+      { name: "Mar", jus: 100, smoothies: 120, detox: 60 },
+      { name: "Mer", jus: 160, smoothies: 90, detox: 100 },
+      { name: "Jeu", jus: 120, smoothies: 140, detox: 90 },
+      { name: "Ven", jus: 200, smoothies: 100, detox: 140 },
+      { name: "Sam", jus: 150, smoothies: 110, detox: 120 },
+      { name: "Dim", jus: 180, smoothies: 130, detox: 150 },
     ],
     [],
   );
 
-  const earnings = useMemo(
+  const revenueData = useMemo(
     () => [
-      { name: "Mon", a: 14, b: 10, c: 9 },
-      { name: "Tue", a: 10, b: 12, c: 8 },
-      { name: "Wed", a: 16, b: 9, c: 10 },
-      { name: "Thu", a: 12, b: 14, c: 11 },
-      { name: "Fri", a: 20, b: 10, c: 14 },
-      { name: "Sat", a: 15, b: 11, c: 12 },
-      { name: "Sun", a: 18, b: 13, c: 15 },
+      { name: "Jan", current: 180000, previous: 100000 },
+      { name: "Fev", current: 140000, previous: 120000 },
+      { name: "Mar", current: 210000, previous: 160000 },
+      { name: "Avr", current: 170000, previous: 140000 },
+      { name: "Mai", current: 240000, previous: 180000 },
+      { name: "Jui", current: 200000, previous: 160000 },
     ],
     [],
   );
 
-  const revenue = useMemo(
+  const categoryData = useMemo(
     () => [
-      { name: "Jan", thisWeek: 18, lastWeek: 10 },
-      { name: "Feb", thisWeek: 14, lastWeek: 12 },
-      { name: "Mar", thisWeek: 21, lastWeek: 16 },
-      { name: "Apr", thisWeek: 17, lastWeek: 14 },
-      { name: "May", thisWeek: 24, lastWeek: 18 },
-      { name: "Jun", thisWeek: 20, lastWeek: 16 },
+      { name: "Jus de fruits", value: 45, color: colors.primary },
+      { name: "Smoothies", value: 30, color: colors.secondary },
+      { name: "Detox", value: 15, color: colors.orange },
+      { name: "Energie", value: 10, color: colors.accent },
     ],
-    [],
+    [colors],
   );
 
-  const customers = useMemo(
-    () => [
-      { name: "Current", value: 68, color: "hsl(var(--primary))" },
-      { name: "New", value: 32, color: "hsl(var(--secondary))" },
-    ],
-    [],
-  );
-
-  const transactions = useMemo(
-    () => [
-      { method: "PayPal", amount: "-29,000" },
-      { method: "Payoneer", amount: "+158,000" },
-      { method: "MasterCard", amount: "-83,000" },
-      { method: "Western Union", amount: "+200,000" },
-    ],
-    [],
-  );
-
-  const bestProductsTable = useMemo(
-    () => [
-      { name: "Mark John", team: "Team A", type: "Fashion", deals: 420, delivery: 95, pending: 5 },
-      { name: "Alex John", team: "Team A", type: "Furniture", deals: 290, delivery: 92, pending: 8 },
-      { name: "James William", team: "Team B", type: "Grocery", deals: 500, delivery: 90, pending: 10 },
-    ],
-    [],
-  );
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Livre": return "bg-primary/10 text-primary";
+      case "En cours": return "bg-secondary/10 text-secondary";
+      case "En attente": return "bg-orange/10 text-orange";
+      default: return "bg-muted text-muted-foreground";
+    }
+  };
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -161,22 +192,30 @@ const AdminDashboard = () => {
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center gap-3 p-6">
+          <div className="flex items-center gap-3 p-6" data-aos="fade-right">
             <Link to="/" className="flex items-center gap-3">
               <AnimatedLogo size="sm" />
               <div className="leading-tight">
-                <div className="text-sm font-semibold">e-commerce</div>
-                <div className="text-xs text-muted-foreground">Admin</div>
+                <div className="text-sm font-semibold">VitaDrinks</div>
+                <div className="text-xs text-muted-foreground">Admin Panel</div>
               </div>
             </Link>
           </div>
 
           <nav className="flex-1 space-y-1 px-4">
-            <div className="px-3 pb-2 text-xs font-medium text-muted-foreground">Overview</div>
-            {navItems.slice(0, 4).map((item) => (
+            <div className="px-3 pb-2 text-xs font-medium text-muted-foreground">Gestion</div>
+            {navItems.slice(0, 4).map((item, index) => (
               <button
                 key={item.id}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                onClick={() => setActiveSection(item.id)}
+                data-aos="fade-right"
+                data-aos-delay={index * 50}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
+                  activeSection === item.id
+                    ? "bg-primary text-white"
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                )}
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
@@ -184,10 +223,18 @@ const AdminDashboard = () => {
             ))}
 
             <div className="px-3 pb-2 pt-4 text-xs font-medium text-muted-foreground">Business</div>
-            {navItems.slice(4).map((item) => (
+            {navItems.slice(4).map((item, index) => (
               <button
                 key={item.id}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                onClick={() => setActiveSection(item.id)}
+                data-aos="fade-right"
+                data-aos-delay={(index + 4) * 50}
+                className={cn(
+                  "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
+                  activeSection === item.id
+                    ? "bg-primary text-white"
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                )}
               >
                 <item.icon className="h-4 w-4" />
                 {item.label}
@@ -195,11 +242,11 @@ const AdminDashboard = () => {
             ))}
           </nav>
 
-          <div className="p-4">
+          <div className="p-4" data-aos="fade-up">
             <Link to="/">
               <Button variant="outline" className="w-full justify-start gap-2 rounded-xl">
                 <LogOut className="h-4 w-4" />
-                Log Out
+                Deconnexion
               </Button>
             </Link>
           </div>
@@ -227,304 +274,268 @@ const AdminDashboard = () => {
             </button>
 
             <div className="flex items-center gap-2">
-              <h1 className="font-display text-lg font-semibold text-foreground">Dashboard</h1>
+              <h1 className="font-display text-lg font-semibold text-foreground">
+                {navItems.find(n => n.id === activeSection)?.label || "Dashboard"}
+              </h1>
             </div>
 
             <div className="hidden flex-1 items-center justify-center lg:flex">
               <div className="relative w-full max-w-xl">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Search for people, documents, goods..."
+                  placeholder="Rechercher vendeurs, produits, commandes..."
                   className="h-11 rounded-2xl bg-muted/50 pl-10"
                 />
               </div>
             </div>
 
             <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-xl">
+              <Button variant="ghost" size="icon" className="rounded-xl relative">
                 <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary text-white text-xs rounded-full flex items-center justify-center">5</span>
               </Button>
-              <div className="h-10 w-10 rounded-xl bg-primary/10" />
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-semibold">
+                A
+              </div>
             </div>
           </div>
         </header>
 
         <main className="p-4 lg:p-6">
-          {/* Top stats */}
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">{s.label}</p>
-                  <span className="text-xs font-medium text-primary">{s.delta}</span>
-                </div>
-                <p className="mt-2 text-xl font-semibold text-foreground">{s.value}</p>
-              </div>
-            ))}
-          </section>
-
-          {/* Cards grid like the reference */}
-          <section className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-12">
-            {/* Orders */}
-            <div className="xl:col-span-3">
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground">Orders</h2>
-                  <span className="text-xs text-muted-foreground">+0.5%</span>
-                </div>
-                <div className="space-y-3">
-                  {orders.map((o) => (
-                    <div key={o.name} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10" />
-                        <span className="text-sm text-foreground">{o.name}</span>
-                      </div>
-                      <span
-                        className={cn(
-                          "rounded-lg px-2 py-1 text-xs font-medium",
-                          o.status === "Delivered" && "bg-primary/10 text-primary",
-                          o.status === "Pending" && "bg-secondary/10 text-secondary",
-                          o.status === "Processing" && "bg-accent/15 text-foreground",
-                        )}
-                      >
-                        {o.status}
-                      </span>
+          {activeSection === "dashboard" && (
+            <>
+              {/* Top stats */}
+              <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">
+                <div className="rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-5 text-white" data-aos="fade-up" data-aos-delay="0">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/80 text-sm">Commandes totales</p>
+                      <p className="text-3xl font-bold mt-1">{animatedStats.orders.toLocaleString()}</p>
+                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" /> +0.5% cette semaine
+                      </p>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Last Orders */}
-            <div className="xl:col-span-3">
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground">Last Orders</h2>
-                  <span className="text-xs text-muted-foreground">Today</span>
-                </div>
-                <div className="space-y-3">
-                  {lastOrders.map((o) => (
-                    <div key={o.name} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-foreground">{o.name}</p>
-                        <p className="text-xs text-muted-foreground">{o.price}</p>
-                      </div>
-                      <span className="rounded-lg bg-primary/10 px-2 py-1 text-xs font-medium text-primary">{o.badge}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Best Products */}
-            <div className="xl:col-span-3">
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground">Best Products</h2>
-                  <span className="text-xs text-muted-foreground">Week</span>
-                </div>
-                <div className="space-y-3">
-                  {bestProducts.map((p) => (
-                    <div key={p.name} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-lg bg-secondary/10" />
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-foreground">{p.name}</p>
-                          <p className="text-xs text-muted-foreground">{p.hint}</p>
-                        </div>
-                      </div>
-                      <span className="h-2 w-2 rounded-full bg-primary" aria-hidden />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Earnings */}
-            <div className="xl:col-span-3">
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground">Earnings</h2>
-                  <span className="text-xs text-muted-foreground">Weekly</span>
-                </div>
-                <div className="h-40 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={earnings} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
-                      <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
-                      <YAxis hide />
-                      <Tooltip cursor={{ fill: "transparent" }} />
-                      <Bar dataKey="a" fill={colors.primary} radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="b" fill={colors.secondary} radius={[8, 8, 0, 0]} />
-                      <Bar dataKey="c" fill={colors.accent} radius={[8, 8, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-
-            {/* Revenue */}
-            <div className="xl:col-span-7">
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground">Revenue</h2>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full" style={{ background: colors.primary }} />
-                      This week
-                    </span>
-                    <span className="inline-flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full" style={{ background: colors.secondary }} />
-                      Last week
-                    </span>
+                    <ShoppingBag className="w-10 h-10 text-white/30" />
                   </div>
                 </div>
-                <div className="h-56 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={revenue} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
-                      <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
-                      <YAxis hide />
-                      <Tooltip cursor={{ stroke: colors.border }} />
-                      <Line type="monotone" dataKey="thisWeek" stroke={colors.primary} strokeWidth={3} dot={false} />
-                      <Line type="monotone" dataKey="lastWeek" stroke={colors.secondary} strokeWidth={3} dot={false} />
-                    </LineChart>
-                  </ResponsiveContainer>
+                
+                <div className="rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 p-5 text-white" data-aos="fade-up" data-aos-delay="100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/80 text-sm">Revenus totaux</p>
+                      <p className="text-2xl font-bold mt-1">{animatedStats.revenue.toLocaleString()} F</p>
+                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" /> +2.1% ce mois
+                      </p>
+                    </div>
+                    <DollarSign className="w-10 h-10 text-white/30" />
+                  </div>
                 </div>
-              </div>
-            </div>
+                
+                <div className="rounded-2xl bg-gradient-to-br from-orange to-orange/80 p-5 text-white" data-aos="fade-up" data-aos-delay="200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-white/80 text-sm">Commission (1%)</p>
+                      <p className="text-2xl font-bold mt-1">{animatedStats.commission.toLocaleString()} F</p>
+                      <p className="text-xs text-white/70 mt-1">{animatedStats.bottles.toLocaleString()} bouteilles vendues</p>
+                    </div>
+                    <Percent className="w-10 h-10 text-white/30" />
+                  </div>
+                </div>
+                
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="300">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-muted-foreground text-sm">Vendeurs actifs</p>
+                      <p className="text-3xl font-bold text-foreground mt-1">{animatedStats.sellers}</p>
+                      <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" /> +3 ce mois
+                      </p>
+                    </div>
+                    <Store className="w-10 h-10 text-muted-foreground/30" />
+                  </div>
+                </div>
+              </section>
 
-            {/* Customers */}
-            <div className="xl:col-span-5">
-              <div className="rounded-2xl border border-border bg-card p-4 shadow-card">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-foreground">Customers</h2>
-                  <span className="text-xs text-muted-foreground">This month</span>
+              {/* Charts Row */}
+              <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-6">
+                {/* Sales by Category */}
+                <div className="xl:col-span-4 rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up">
+                  <h2 className="text-sm font-semibold text-foreground mb-4">Ventes par categorie</h2>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={salesData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                        <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
+                        <YAxis hide />
+                        <Tooltip cursor={{ fill: "transparent" }} />
+                        <Bar dataKey="jus" fill={colors.primary} radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="smoothies" fill={colors.secondary} radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="detox" fill={colors.orange} radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex justify-center gap-4 mt-3 text-xs">
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary" />Jus</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-secondary" />Smoothies</span>
+                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange" />Detox</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="h-52">
+                {/* Revenue Chart */}
+                <div className="xl:col-span-5 rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-foreground">Evolution des revenus</h2>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <span className="h-2 w-2 rounded-full bg-primary" />Ce mois
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <span className="h-2 w-2 rounded-full bg-secondary" />Mois dernier
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={revenueData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                        <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
+                        <YAxis hide />
+                        <Tooltip cursor={{ stroke: colors.border }} />
+                        <Line type="monotone" dataKey="current" stroke={colors.primary} strokeWidth={3} dot={false} />
+                        <Line type="monotone" dataKey="previous" stroke={colors.secondary} strokeWidth={3} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Category Distribution */}
+                <div className="xl:col-span-3 rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="200">
+                  <h2 className="text-sm font-semibold text-foreground mb-4">Repartition</h2>
+                  <div className="h-36">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={customers}
-                          innerRadius={55}
-                          outerRadius={80}
+                          data={categoryData}
+                          innerRadius={40}
+                          outerRadius={60}
                           paddingAngle={2}
                           dataKey="value"
                           stroke="transparent"
                         >
-                          {customers.map((entry, i) => (
+                          {categoryData.map((entry, i) => (
                             <Cell key={i} fill={entry.color} />
                           ))}
                         </Pie>
-                        {/* Recharts typing workaround below */}
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
-
-                  {/* Recharts PieChart requires <Cell>. We'll render it separately to avoid TS issues across versions. */}
-                  <div className="flex flex-col justify-center gap-3">
-                    <div className="rounded-xl bg-muted/40 p-3">
-                      <div className="text-xs text-muted-foreground">Current Customers</div>
-                      <div className="mt-1 text-lg font-semibold text-foreground">68%</div>
-                    </div>
-                    <div className="rounded-xl bg-muted/40 p-3">
-                      <div className="text-xs text-muted-foreground">New Customers</div>
-                      <div className="mt-1 text-lg font-semibold text-foreground">32%</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Render Pie with Cell in a hidden chart for consistent colors across versions */}
-                <div className="sr-only" aria-hidden>
-                  <ResponsiveContainer width={1} height={1}>
-                    <PieChart>
-                      <Pie data={customers} dataKey="value">
-                        <Cell fill={colors.primary} />
-                        <Cell fill={colors.secondary} />
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-
-                <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-muted-foreground">
-                  <div className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full" style={{ background: colors.primary }} />
-                    Current
-                  </div>
-                  <div className="inline-flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full" style={{ background: colors.secondary }} />
-                    New
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Bottom table */}
-          <section className="mt-6 rounded-2xl border border-border bg-card shadow-card">
-            <div className="flex items-center justify-between p-4">
-              <h2 className="text-sm font-semibold text-foreground">Best Products</h2>
-              <Button variant="outline" size="sm" className="rounded-xl">
-                Weekly
-              </Button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-[720px] w-full">
-                <thead className="bg-muted/40">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Name</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Team</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Type</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Total Deals</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Delivery</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Pending</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {bestProductsTable.map((row) => (
-                    <tr key={row.name} className="hover:bg-muted/20">
-                      <td className="px-4 py-3 text-sm text-foreground">{row.name}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{row.team}</td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">{row.type}</td>
-                      <td className="px-4 py-3 text-sm text-foreground">{row.deals}</td>
-                      <td className="px-4 py-3 text-sm text-foreground">{row.delivery}%</td>
-                      <td className="px-4 py-3 text-sm text-foreground">{row.pending}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="border-t border-border p-4">
-              <h3 className="mb-3 text-sm font-semibold text-foreground">Transaction</h3>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <div className="space-y-2">
-                  {transactions.map((t) => (
-                    <div key={t.method} className="flex items-center justify-between rounded-xl bg-muted/40 px-3 py-2">
-                      <span className="text-sm text-foreground">{t.method}</span>
-                      <span className={cn("text-sm font-medium", t.amount.startsWith("+") ? "text-primary" : "text-destructive")}>
-                        {t.amount} FCFA
+                  <div className="grid grid-cols-2 gap-2 text-xs mt-2">
+                    {categoryData.map((cat, i) => (
+                      <span key={i} className="flex items-center gap-1 text-muted-foreground">
+                        <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
+                        {cat.name} ({cat.value}%)
                       </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="rounded-2xl bg-muted/30 p-4">
-                  <h4 className="text-sm font-semibold text-foreground">Quick Transfer</h4>
-                  <div className="mt-3 space-y-3">
-                    <Input className="h-11 rounded-xl bg-background" placeholder="Card Number" />
-                    <div className="grid grid-cols-2 gap-3">
-                      <Input className="h-11 rounded-xl bg-background" placeholder="Amount" />
-                      <Input className="h-11 rounded-xl bg-background" placeholder="Currency" />
-                    </div>
-                    <Button className="w-full rounded-xl">Send</Button>
+                    ))}
                   </div>
                 </div>
+              </section>
+
+              {/* Tables Row */}
+              <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Recent Orders */}
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-foreground">Commandes recentes</h2>
+                    <Button variant="ghost" size="sm" className="text-primary text-xs">Voir tout</Button>
+                  </div>
+                  <div className="space-y-3">
+                    {recentOrders.map((order, i) => (
+                      <div key={order.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30" data-aos="fade-left" data-aos-delay={i * 50}>
+                        <div>
+                          <p className="font-medium text-sm text-foreground">{order.id}</p>
+                          <p className="text-xs text-muted-foreground">{order.product}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </span>
+                          <p className="text-xs text-foreground font-medium mt-1">{order.amount}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Sellers */}
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="100">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-foreground">Meilleurs vendeurs</h2>
+                    <Button variant="ghost" size="sm" className="text-primary text-xs">Voir tout</Button>
+                  </div>
+                  <div className="space-y-3">
+                    {topSellers.map((seller, i) => (
+                      <div key={seller.name} className="flex items-center justify-between p-3 rounded-xl bg-muted/30" data-aos="fade-left" data-aos-delay={i * 50}>
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-xs font-bold">
+                            {i + 1}
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm text-foreground">{seller.name}</p>
+                            <p className="text-xs text-muted-foreground">{seller.sales} ventes</p>
+                          </div>
+                        </div>
+                        <p className="text-xs text-primary font-medium">{seller.revenue}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Top Products */}
+                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-sm font-semibold text-foreground">Produits populaires</h2>
+                    <Button variant="ghost" size="sm" className="text-primary text-xs">Voir tout</Button>
+                  </div>
+                  <div className="space-y-3">
+                    {topProducts.map((product, i) => (
+                      <div key={product.name} className="flex items-center justify-between p-3 rounded-xl bg-muted/30" data-aos="fade-left" data-aos-delay={i * 50}>
+                        <div>
+                          <p className="font-medium text-sm text-foreground">{product.name}</p>
+                          <p className="text-xs text-muted-foreground">{product.bottles} bouteilles</p>
+                        </div>
+                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${product.profit === 'High' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}>
+                          {product.profit === 'High' ? 'Rentable' : 'Moyen'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            </>
+          )}
+
+          {/* Other sections - Empty States */}
+          {activeSection !== "dashboard" && (
+            <div className="flex items-center justify-center min-h-[60vh]" data-aos="zoom-in">
+              <div className="text-center max-w-md">
+                <img 
+                  src={noDataImg} 
+                  alt="Empty state" 
+                  className="w-48 h-48 mx-auto mb-6 object-contain"
+                />
+                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+                  Section {navItems.find(n => n.id === activeSection)?.label}
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                  Cette fonctionnalite sera bientot disponible. Restez connecte!
+                </p>
+                <Button onClick={() => setActiveSection("dashboard")} className="rounded-xl">
+                  Retour au tableau de bord
+                </Button>
               </div>
             </div>
-          </section>
+          )}
         </main>
       </div>
     </div>

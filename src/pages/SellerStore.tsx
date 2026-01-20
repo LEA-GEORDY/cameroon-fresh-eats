@@ -227,11 +227,8 @@ const SellerStore = () => {
               </p>
             </div>
 
-            {/* Actions */}
+            {/* Actions - No favorites button */}
             <div className="flex gap-3 pt-4">
-              <Button variant="outline" size="icon">
-                <FiHeart className="w-5 h-5" />
-              </Button>
               <Button 
                 onClick={() => setShowChatbot(true)}
                 className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"

@@ -325,9 +325,9 @@ export const sellers: Seller[] = [
 ];
 
 export const categories = [
-  { id: "all", name: "Tous", icon: "🍹" },
-  { id: "jus", name: "Jus de Fruits", icon: "🍊" },
-  { id: "smoothies", name: "Smoothies", icon: "🥤" },
-  { id: "detox", name: "Détox", icon: "🥬" },
-  { id: "energy", name: "Énergie", icon: "⚡" },
+  { id: "all", name: "Tous" },
+  { id: "jus", name: "Jus de Fruits" },
+  { id: "smoothies", name: "Smoothies" },
+  { id: "detox", name: "Detox" },
+  { id: "energy", name: "Energie" },
 ];
