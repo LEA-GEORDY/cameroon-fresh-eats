@@ -8,22 +8,22 @@ import {
   Menu,
   Package,
   Search,
-  Settings,
-  Shield,
   ShoppingBag,
   Store,
-  Users,
-  DollarSign,
   TrendingUp,
-  Percent,
+  MessageSquare,
+  ChevronRight,
+  CreditCard,
+  Send,
+  Eye,
 } from "lucide-react";
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -36,16 +36,26 @@ import AnimatedLogo from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import noDataImg from "@/assets/empty-states/no-data.png";
+import { Progress } from "@/components/ui/progress";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 const AdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [progressValues, setProgressValues] = useState<number[]>([0, 0, 0, 0, 0]);
 
   useEffect(() => {
     AOS.init({ duration: 600, once: true, easing: "ease-out-cubic" });
+  }, []);
+
+  // Animated progress bars
+  useEffect(() => {
+    const targetValues = [85, 72, 60, 45, 38];
+    const timer = setTimeout(() => {
+      setProgressValues(targetValues);
+    }, 800);
+    return () => clearTimeout(timer);
   }, []);
 
   // Animated counters
@@ -54,12 +64,10 @@ const AdminDashboard = () => {
     revenue: 0,
     customers: 0,
     sellers: 0,
-    commission: 0,
-    bottles: 0,
   });
 
   useEffect(() => {
-    const targets = { orders: 1256, revenue: 2450000, customers: 3420, sellers: 58, commission: 24500, bottles: 8750 };
+    const targets = { orders: 6370, revenue: 3100, customers: 32, sellers: 58 };
     const duration = 2000;
     const steps = 60;
     const stepDuration = duration / steps;
@@ -75,8 +83,6 @@ const AdminDashboard = () => {
         revenue: Math.floor(targets.revenue * easeOut),
         customers: Math.floor(targets.customers * easeOut),
         sellers: Math.floor(targets.sellers * easeOut),
-        commission: Math.floor(targets.commission * easeOut),
-        bottles: Math.floor(targets.bottles * easeOut),
       });
 
       if (currentStep >= steps) clearInterval(interval);
@@ -87,166 +93,231 @@ const AdminDashboard = () => {
 
   const colors = useMemo(
     () => ({
-      primary: "hsl(var(--primary))",
-      secondary: "hsl(var(--secondary))",
-      accent: "hsl(var(--accent))",
-      orange: "hsl(var(--orange))",
-      muted: "hsl(var(--muted-foreground))",
-      border: "hsl(var(--border))",
+      primary: "hsl(142 70% 45%)",
+      secondary: "hsl(32 95% 55%)",
+      accent: "hsl(45 100% 50%)",
+      red: "hsl(0 84% 60%)",
+      blue: "hsl(210 100% 50%)",
+      purple: "hsl(270 70% 55%)",
+      muted: "hsl(142 20% 45%)",
+      border: "hsl(142 20% 88%)",
     }),
     [],
   );
 
-  const navItems = useMemo(
+  const overviewItems = useMemo(
     () => [
       { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { id: "users", label: "Utilisateurs", icon: Users },
-      { id: "products", label: "Produits", icon: Package },
-      { id: "orders", label: "Commandes", icon: ShoppingBag },
-      { id: "sellers", label: "Vendeurs", icon: Store },
+      { id: "projects", label: "Projets", icon: Package },
       { id: "analytics", label: "Statistiques", icon: BarChart3 },
-      { id: "security", label: "Securite", icon: Shield },
-      { id: "settings", label: "Parametres", icon: Settings },
+      { id: "reports", label: "Rapports", icon: Eye },
     ],
     [],
   );
 
-  const recentOrders = useMemo(
+  const businessItems = useMemo(
     () => [
-      { id: "CMD-1001", product: "Orange Mangue x5", status: "Livre", amount: "4,000 FCFA" },
-      { id: "CMD-1002", product: "Detox Vert x3", status: "En cours", amount: "2,850 FCFA" },
-      { id: "CMD-1003", product: "Tropical x2", status: "En attente", amount: "1,500 FCFA" },
+      { id: "store", label: "Boutique", icon: Store },
+      { id: "outlet", label: "Points de vente", icon: ShoppingBag },
+      { id: "products", label: "Produits", icon: Package },
     ],
     [],
   );
 
-  const topSellers = useMemo(
+  const otherItems = useMemo(
     () => [
-      { name: "Fruits du Soleil", sales: 420, revenue: "336,000 FCFA" },
-      { name: "Bio Nature Plus", sales: 290, revenue: "275,500 FCFA" },
-      { name: "Saveurs d'Afrique", sales: 180, revenue: "144,000 FCFA" },
+      { id: "chat", label: "Chat", icon: MessageSquare, badge: 3 },
     ],
     [],
   );
 
-  const topProducts = useMemo(
+  // Orders data
+  const orders = useMemo(
     () => [
-      { name: "Orange Mangue Passion", bottles: 1250, profit: "High" },
-      { name: "Detox Vert Energie", bottles: 980, profit: "Medium" },
-      { name: "Tropical Paradise", bottles: 750, profit: "High" },
+      { id: "63270", name: "Sac à dos", status: "Livré", statusColor: "bg-primary text-white" },
+      { id: "63055", name: "Canapé jaune", status: "En attente", statusColor: "bg-orange text-white" },
+      { id: "15555", name: "Mobilier", status: "En attente", statusColor: "bg-orange text-white" },
     ],
     [],
   );
 
-  const salesData = useMemo(
+  // Last orders
+  const lastOrders = useMemo(
     () => [
-      { name: "Lun", jus: 140, smoothies: 100, detox: 80 },
-      { name: "Mar", jus: 100, smoothies: 120, detox: 60 },
-      { name: "Mer", jus: 160, smoothies: 90, detox: 100 },
-      { name: "Jeu", jus: 120, smoothies: 140, detox: 90 },
-      { name: "Ven", jus: 200, smoothies: 100, detox: 140 },
-      { name: "Sam", jus: 150, smoothies: 110, detox: 120 },
-      { name: "Dim", jus: 180, smoothies: 130, detox: 150 },
+      { name: "Chaise Noire", store: "VitaJuice Zone", price: 89, color: "bg-foreground" },
+      { name: "Canapé Rouge", store: "VitaJuice Zone", price: 100, color: "bg-secondary" },
+      { name: "Lampe de table", store: "VitaJuice Zone", price: 130, color: "bg-primary" },
     ],
     [],
   );
 
+  // Best products
+  const bestProducts = useMemo(
+    () => [
+      { name: "Orange Mangue", store: "VitaJuice Zone", type: "Top", stars: 5 },
+      { name: "Detox Vert", store: "VitaJuice Zone", type: "Best Selling", stars: 4 },
+      { name: "Tropical Mix", store: "VitaJuice Zone", type: "Popular", stars: 4 },
+    ],
+    [],
+  );
+
+  // Revenue data with animated values
   const revenueData = useMemo(
     () => [
-      { name: "Jan", current: 180000, previous: 100000 },
-      { name: "Fev", current: 140000, previous: 120000 },
-      { name: "Mar", current: 210000, previous: 160000 },
-      { name: "Avr", current: 170000, previous: 140000 },
-      { name: "Mai", current: 240000, previous: 180000 },
-      { name: "Jui", current: 200000, previous: 160000 },
+      { name: "Dim", thisWeek: 1100, lastWeek: 800 },
+      { name: "Lun", thisWeek: 1600, lastWeek: 1200 },
+      { name: "Mar", thisWeek: 1400, lastWeek: 1000 },
+      { name: "Mer", thisWeek: 2000, lastWeek: 1500 },
+      { name: "Jeu", thisWeek: 1800, lastWeek: 1400 },
+      { name: "Ven", thisWeek: 3100, lastWeek: 2200 },
+      { name: "Sam", thisWeek: 2800, lastWeek: 2000 },
     ],
     [],
   );
 
-  const categoryData = useMemo(
+  // Customer distribution (donut chart)
+  const customerData = useMemo(
     () => [
-      { name: "Jus de fruits", value: 45, color: colors.primary },
-      { name: "Smoothies", value: 30, color: colors.secondary },
-      { name: "Detox", value: 15, color: colors.orange },
-      { name: "Energie", value: 10, color: colors.accent },
+      { name: "Clients actuels", value: 68, color: colors.primary },
+      { name: "Nouveaux clients", value: 32, color: colors.secondary },
     ],
     [colors],
   );
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Livre": return "bg-primary/10 text-primary";
-      case "En cours": return "bg-secondary/10 text-secondary";
-      case "En attente": return "bg-orange/10 text-orange";
-      default: return "bg-muted text-muted-foreground";
-    }
-  };
+  // Earnings chart data
+  const earningsData = useMemo(
+    () => [
+      { name: "Profit", value: 85, color: colors.primary },
+      { name: "Croissance", value: 72, color: colors.secondary },
+      { name: "Ventes", value: 60, color: colors.blue },
+    ],
+    [colors],
+  );
+
+  // Transactions
+  const transactions = useMemo(
+    () => [
+      { name: "PayPal", date: "Avr 05, 2022 at 21:44", amount: "+$29.49", color: "bg-blue-500" },
+      { name: "Payoneer", date: "Fév 14, 2022 at 03:56", amount: "+$175.63", color: "bg-orange" },
+      { name: "MasterCard", date: "Jan 14, 2022 at 16:56", amount: "-$32.75", color: "bg-secondary" },
+      { name: "Western Union", date: "Jan 14, 2022 at 16:56", amount: "-$200.63", color: "bg-accent" },
+    ],
+    [],
+  );
+
+  // Best products table
+  const bestProductsTable = useMemo(
+    () => [
+      { name: "Marc John", team: "Equipe A", type: "Mode", deals: "120+", delivery: 15, pending: 5, progress: 85 },
+      { name: "Alex John", team: "Equipe A", type: "Mobilier", deals: "200+", delivery: 100, pending: 100, progress: 72 },
+      { name: "James William", team: "Equipe A", type: "Mode", deals: "500+", delivery: 200, pending: 101, progress: 60 },
+    ],
+    [],
+  );
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-[hsl(142_30%_96%)]">
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-72 border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform duration-300 lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-56 bg-[hsl(142_40%_97%)] transition-transform duration-300 lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center gap-3 p-6" data-aos="fade-right">
-            <Link to="/" className="flex items-center gap-3">
+          {/* Logo */}
+          <div className="flex items-center gap-2 p-4" data-aos="fade-right">
+            <Link to="/" className="flex items-center gap-2">
               <AnimatedLogo size="sm" />
-              <div className="leading-tight">
-                <div className="text-sm font-semibold">VitaDrinks</div>
-                <div className="text-xs text-muted-foreground">Admin Panel</div>
-              </div>
+              <span className="text-sm font-semibold text-primary">VitaDrinks</span>
             </Link>
           </div>
 
-          <nav className="flex-1 space-y-1 px-4">
-            <div className="px-3 pb-2 text-xs font-medium text-muted-foreground">Gestion</div>
-            {navItems.slice(0, 4).map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                data-aos="fade-right"
-                data-aos-delay={index * 50}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
-                  activeSection === item.id
-                    ? "bg-primary text-white"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                )}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </button>
-            ))}
+          {/* Navigation */}
+          <nav className="flex-1 px-3 py-4">
+            {/* Overview Section */}
+            <div className="mb-4">
+              <p className="px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Aperçu
+              </p>
+              {overviewItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  data-aos="fade-right"
+                  data-aos-delay={index * 50}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                    activeSection === item.id
+                      ? "bg-primary text-white shadow-md"
+                      : "text-foreground/70 hover:bg-primary/10 hover:text-primary"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </button>
+              ))}
+            </div>
 
-            <div className="px-3 pb-2 pt-4 text-xs font-medium text-muted-foreground">Business</div>
-            {navItems.slice(4).map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                data-aos="fade-right"
-                data-aos-delay={(index + 4) * 50}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
-                  activeSection === item.id
-                    ? "bg-primary text-white"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                )}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </button>
-            ))}
+            {/* Business Section */}
+            <div className="mb-4">
+              <p className="px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                Business
+              </p>
+              {businessItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  data-aos="fade-right"
+                  data-aos-delay={(index + 4) * 50}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                    activeSection === item.id
+                      ? "bg-primary text-white shadow-md"
+                      : "text-foreground/70 hover:bg-primary/10 hover:text-primary"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Other Items */}
+            <div className="border-t border-border pt-4">
+              {otherItems.map((item, index) => (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  data-aos="fade-right"
+                  data-aos-delay={(index + 7) * 50}
+                  className={cn(
+                    "flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm transition-all duration-200",
+                    activeSection === item.id
+                      ? "bg-primary text-white shadow-md"
+                      : "text-foreground/70 hover:bg-primary/10 hover:text-primary"
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </span>
+                  {item.badge && (
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-[10px] text-white">
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
           </nav>
 
-          <div className="p-4" data-aos="fade-up">
+          {/* Logout */}
+          <div className="p-3" data-aos="fade-up">
             <Link to="/">
-              <Button variant="outline" className="w-full justify-start gap-2 rounded-xl">
+              <Button variant="ghost" className="w-full justify-start gap-2 text-foreground/70 hover:text-primary hover:bg-primary/10">
                 <LogOut className="h-4 w-4" />
-                Deconnexion
+                Déconnexion
               </Button>
             </Link>
           </div>
@@ -261,281 +332,439 @@ const AdminDashboard = () => {
         />
       )}
 
-      {/* Content */}
-      <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="flex h-16 items-center gap-3 px-4 lg:px-6">
+      {/* Main Content */}
+      <div className="lg:pl-56">
+        {/* Header */}
+        <header className="sticky top-0 z-30 bg-[hsl(142_30%_96%)]/80 backdrop-blur-xl">
+          <div className="flex h-14 items-center gap-3 px-4 lg:px-6">
             <button
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted lg:hidden"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted lg:hidden"
               onClick={() => setSidebarOpen((v) => !v)}
               aria-label="Open menu"
             >
               <Menu className="h-5 w-5" />
             </button>
 
-            <div className="flex items-center gap-2">
-              <h1 className="font-display text-lg font-semibold text-foreground">
-                {navItems.find(n => n.id === activeSection)?.label || "Dashboard"}
+            <div className="flex-1">
+              <h1 className="text-xl font-bold text-foreground" data-aos="fade-down">
+                Dashboard
               </h1>
+              <p className="text-xs text-muted-foreground">Tous les détails sur vos ventes...</p>
             </div>
 
-            <div className="hidden flex-1 items-center justify-center lg:flex">
-              <div className="relative w-full max-w-xl">
+            {/* Search */}
+            <div className="hidden lg:flex flex-1 max-w-md" data-aos="fade-down" data-aos-delay="100">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="Rechercher vendeurs, produits, commandes..."
-                  className="h-11 rounded-2xl bg-muted/50 pl-10"
+                  placeholder="Rechercher personnes, documents, produits..."
+                  className="h-9 rounded-full bg-card pl-9 border-border/50 text-sm"
                 />
               </div>
             </div>
 
-            <div className="ml-auto flex items-center gap-2">
-              <Button variant="ghost" size="icon" className="rounded-xl relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary text-white text-xs rounded-full flex items-center justify-center">5</span>
+            {/* Actions */}
+            <div className="flex items-center gap-2" data-aos="fade-down" data-aos-delay="200">
+              <Button variant="ghost" size="icon" className="rounded-full relative h-9 w-9 bg-card">
+                <Bell className="h-4 w-4" />
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-secondary text-white text-[10px] rounded-full flex items-center justify-center">
+                  3
+                </span>
               </Button>
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white font-semibold">
+              <div className="h-9 w-9 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-sm font-semibold">
                 A
               </div>
             </div>
           </div>
         </header>
 
-        <main className="p-4 lg:p-6">
-          {activeSection === "dashboard" && (
-            <>
-              {/* Top stats */}
-              <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">
-                <div className="rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-5 text-white" data-aos="fade-up" data-aos-delay="0">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white/80 text-sm">Commandes totales</p>
-                      <p className="text-3xl font-bold mt-1">{animatedStats.orders.toLocaleString()}</p>
-                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" /> +0.5% cette semaine
-                      </p>
-                    </div>
-                    <ShoppingBag className="w-10 h-10 text-white/30" />
-                  </div>
-                </div>
-                
-                <div className="rounded-2xl bg-gradient-to-br from-secondary to-secondary/80 p-5 text-white" data-aos="fade-up" data-aos-delay="100">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white/80 text-sm">Revenus totaux</p>
-                      <p className="text-2xl font-bold mt-1">{animatedStats.revenue.toLocaleString()} F</p>
-                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" /> +2.1% ce mois
-                      </p>
-                    </div>
-                    <DollarSign className="w-10 h-10 text-white/30" />
-                  </div>
-                </div>
-                
-                <div className="rounded-2xl bg-gradient-to-br from-orange to-orange/80 p-5 text-white" data-aos="fade-up" data-aos-delay="200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-white/80 text-sm">Commission (1%)</p>
-                      <p className="text-2xl font-bold mt-1">{animatedStats.commission.toLocaleString()} F</p>
-                      <p className="text-xs text-white/70 mt-1">{animatedStats.bottles.toLocaleString()} bouteilles vendues</p>
-                    </div>
-                    <Percent className="w-10 h-10 text-white/30" />
-                  </div>
-                </div>
-                
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-muted-foreground text-sm">Vendeurs actifs</p>
-                      <p className="text-3xl font-bold text-foreground mt-1">{animatedStats.sellers}</p>
-                      <p className="text-xs text-primary mt-1 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" /> +3 ce mois
-                      </p>
-                    </div>
-                    <Store className="w-10 h-10 text-muted-foreground/30" />
-                  </div>
-                </div>
-              </section>
-
-              {/* Charts Row */}
-              <section className="grid grid-cols-1 xl:grid-cols-12 gap-6 mb-6">
-                {/* Sales by Category */}
-                <div className="xl:col-span-4 rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up">
-                  <h2 className="text-sm font-semibold text-foreground mb-4">Ventes par categorie</h2>
-                  <div className="h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={salesData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
-                        <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
-                        <YAxis hide />
-                        <Tooltip cursor={{ fill: "transparent" }} />
-                        <Bar dataKey="jus" fill={colors.primary} radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="smoothies" fill={colors.secondary} radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="detox" fill={colors.orange} radius={[4, 4, 0, 0]} />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="flex justify-center gap-4 mt-3 text-xs">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary" />Jus</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-secondary" />Smoothies</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange" />Detox</span>
-                  </div>
-                </div>
-
-                {/* Revenue Chart */}
-                <div className="xl:col-span-5 rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="100">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-sm font-semibold text-foreground">Evolution des revenus</h2>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <span className="h-2 w-2 rounded-full bg-primary" />Ce mois
-                      </span>
-                      <span className="inline-flex items-center gap-1">
-                        <span className="h-2 w-2 rounded-full bg-secondary" />Mois dernier
-                      </span>
-                    </div>
-                  </div>
-                  <div className="h-48">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={revenueData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
-                        <CartesianGrid stroke={colors.border} strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} stroke={colors.muted} />
-                        <YAxis hide />
-                        <Tooltip cursor={{ stroke: colors.border }} />
-                        <Line type="monotone" dataKey="current" stroke={colors.primary} strokeWidth={3} dot={false} />
-                        <Line type="monotone" dataKey="previous" stroke={colors.secondary} strokeWidth={3} dot={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                {/* Category Distribution */}
-                <div className="xl:col-span-3 rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="200">
-                  <h2 className="text-sm font-semibold text-foreground mb-4">Repartition</h2>
-                  <div className="h-36">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryData}
-                          innerRadius={40}
-                          outerRadius={60}
-                          paddingAngle={2}
-                          dataKey="value"
-                          stroke="transparent"
-                        >
-                          {categoryData.map((entry, i) => (
-                            <Cell key={i} fill={entry.color} />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs mt-2">
-                    {categoryData.map((cat, i) => (
-                      <span key={i} className="flex items-center gap-1 text-muted-foreground">
-                        <span className="w-2 h-2 rounded-full" style={{ background: cat.color }} />
-                        {cat.name} ({cat.value}%)
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </section>
-
-              {/* Tables Row */}
-              <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Recent Orders */}
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-sm font-semibold text-foreground">Commandes recentes</h2>
-                    <Button variant="ghost" size="sm" className="text-primary text-xs">Voir tout</Button>
-                  </div>
-                  <div className="space-y-3">
-                    {recentOrders.map((order, i) => (
-                      <div key={order.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/30" data-aos="fade-left" data-aos-delay={i * 50}>
-                        <div>
-                          <p className="font-medium text-sm text-foreground">{order.id}</p>
-                          <p className="text-xs text-muted-foreground">{order.product}</p>
-                        </div>
-                        <div className="text-right">
-                          <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
-                          <p className="text-xs text-foreground font-medium mt-1">{order.amount}</p>
-                        </div>
+        {/* Dashboard Content */}
+        <main className="p-4 lg:p-6 space-y-6">
+          {/* Top Row - Orders, Last Orders, Best Products, Earnings */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {/* Orders Card */}
+            <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-foreground text-sm">Commandes</h3>
+                <span className="text-xs text-primary flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3" /> +0.51%
+                </span>
+              </div>
+              <div className="space-y-2">
+                {orders.map((order, i) => (
+                  <div
+                    key={order.id}
+                    className="flex items-center justify-between py-2 border-b border-border/50 last:border-0"
+                    data-aos="fade-right"
+                    data-aos-delay={i * 100}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                        <Package className="w-4 h-4 text-muted-foreground" />
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Top Sellers */}
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="100">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-sm font-semibold text-foreground">Meilleurs vendeurs</h2>
-                    <Button variant="ghost" size="sm" className="text-primary text-xs">Voir tout</Button>
-                  </div>
-                  <div className="space-y-3">
-                    {topSellers.map((seller, i) => (
-                      <div key={seller.name} className="flex items-center justify-between p-3 rounded-xl bg-muted/30" data-aos="fade-left" data-aos-delay={i * 50}>
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-xs font-bold">
-                            {i + 1}
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm text-foreground">{seller.name}</p>
-                            <p className="text-xs text-muted-foreground">{seller.sales} ventes</p>
-                          </div>
-                        </div>
-                        <p className="text-xs text-primary font-medium">{seller.revenue}</p>
+                      <div>
+                        <p className="text-xs font-medium text-foreground">{order.name}</p>
+                        <p className="text-[10px] text-muted-foreground">ID: {order.id}</p>
                       </div>
-                    ))}
+                    </div>
+                    <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-medium", order.statusColor)}>
+                      {order.status}
+                    </span>
                   </div>
-                </div>
-
-                {/* Top Products */}
-                <div className="rounded-2xl border border-border bg-card p-5 shadow-card" data-aos="fade-up" data-aos-delay="200">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-sm font-semibold text-foreground">Produits populaires</h2>
-                    <Button variant="ghost" size="sm" className="text-primary text-xs">Voir tout</Button>
-                  </div>
-                  <div className="space-y-3">
-                    {topProducts.map((product, i) => (
-                      <div key={product.name} className="flex items-center justify-between p-3 rounded-xl bg-muted/30" data-aos="fade-left" data-aos-delay={i * 50}>
-                        <div>
-                          <p className="font-medium text-sm text-foreground">{product.name}</p>
-                          <p className="text-xs text-muted-foreground">{product.bottles} bouteilles</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-lg text-xs font-medium ${product.profit === 'High' ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'}`}>
-                          {product.profit === 'High' ? 'Rentable' : 'Moyen'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </section>
-            </>
-          )}
-
-          {/* Other sections - Empty States */}
-          {activeSection !== "dashboard" && (
-            <div className="flex items-center justify-center min-h-[60vh]" data-aos="zoom-in">
-              <div className="text-center max-w-md">
-                <img 
-                  src={noDataImg} 
-                  alt="Empty state" 
-                  className="w-48 h-48 mx-auto mb-6 object-contain"
-                />
-                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                  Section {navItems.find(n => n.id === activeSection)?.label}
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Cette fonctionnalite sera bientot disponible. Restez connecte!
-                </p>
-                <Button onClick={() => setActiveSection("dashboard")} className="rounded-xl">
-                  Retour au tableau de bord
-                </Button>
+                ))}
               </div>
             </div>
-          )}
+
+            {/* Last Orders Card */}
+            <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+              <h3 className="font-semibold text-foreground text-sm mb-3">Dernières Commandes</h3>
+              <div className="space-y-2">
+                {lastOrders.map((order, i) => (
+                  <div
+                    key={order.name}
+                    className="flex items-center justify-between py-2"
+                    data-aos="fade-right"
+                    data-aos-delay={i * 100 + 100}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className={cn("w-8 h-8 rounded-lg", order.color)} />
+                      <div>
+                        <p className="text-xs font-medium text-foreground">{order.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{order.store}</p>
+                      </div>
+                    </div>
+                    <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-lg">
+                      ${order.price}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Best Products Card */}
+            <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+              <h3 className="font-semibold text-foreground text-sm mb-3">Meilleurs Produits</h3>
+              <div className="space-y-2">
+                {bestProducts.map((product, i) => (
+                  <div
+                    key={product.name}
+                    className="flex items-center justify-between py-2"
+                    data-aos="fade-right"
+                    data-aos-delay={i * 100 + 200}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-[10px] font-bold">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-foreground">{product.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{product.store}</p>
+                      </div>
+                    </div>
+                    <div className="flex">
+                      {[...Array(product.stars)].map((_, idx) => (
+                        <span key={idx} className="text-accent text-xs">★</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Earnings Card */}
+            <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up" data-aos-delay="300">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-foreground text-sm">Revenus</h3>
+                <Button variant="ghost" size="sm" className="text-xs h-7 text-muted-foreground">
+                  Voir Plus <ChevronRight className="w-3 h-3 ml-1" />
+                </Button>
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <select className="text-[10px] bg-muted rounded px-2 py-1 border-0">
+                  <option>Mensuel</option>
+                  <option>Hebdomadaire</option>
+                </select>
+                <div className="flex gap-1 ml-auto">
+                  {earningsData.map((item, i) => (
+                    <div
+                      key={item.name}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center"
+                      style={{ backgroundColor: `${item.color}20` }}
+                    >
+                      <BarChart3 className="w-4 h-4" style={{ color: item.color }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="h-20">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={earningsData} layout="vertical">
+                    <XAxis type="number" hide />
+                    <YAxis type="category" dataKey="name" hide />
+                    <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                      {earningsData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Middle Row - Revenue Chart, Customers Donut, Transactions */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Revenue Chart */}
+            <div className="lg:col-span-5 bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground text-sm">Revenus</h3>
+                <div className="flex items-center gap-3 text-[10px]">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                    Cette semaine
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-muted-foreground/30" />
+                    Semaine dernière
+                  </span>
+                </div>
+              </div>
+              <div className="text-2xl font-bold text-foreground mb-2">
+                ${animatedStats.revenue.toLocaleString()}
+              </div>
+              <div className="h-40 relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={revenueData}>
+                    <defs>
+                      <linearGradient id="colorThisWeek" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={colors.primary} stopOpacity={0.3} />
+                        <stop offset="95%" stopColor={colors.primary} stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorLastWeek" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={colors.muted} stopOpacity={0.2} />
+                        <stop offset="95%" stopColor={colors.muted} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={colors.border} vertical={false} />
+                    <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={10} stroke={colors.muted} />
+                    <YAxis hide />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(0 0% 100%)',
+                        border: '1px solid hsl(142 20% 88%)',
+                        borderRadius: '8px',
+                        fontSize: '11px',
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="thisWeek"
+                      stroke={colors.primary}
+                      strokeWidth={2}
+                      fillOpacity={1}
+                      fill="url(#colorThisWeek)"
+                      animationDuration={2000}
+                      animationEasing="ease-out"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="lastWeek"
+                      stroke={colors.muted}
+                      strokeWidth={2}
+                      strokeDasharray="4 4"
+                      fillOpacity={1}
+                      fill="url(#colorLastWeek)"
+                      animationDuration={2000}
+                      animationEasing="ease-out"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Customers Donut Chart */}
+            <div className="lg:col-span-3 bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-foreground text-sm">Clients</h3>
+                <div className="flex items-center gap-2 text-[10px]">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-primary" />
+                    Actuels
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-secondary" />
+                    Nouveaux
+                  </span>
+                </div>
+              </div>
+              <div className="relative h-36 flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={customerData}
+                      innerRadius={45}
+                      outerRadius={60}
+                      paddingAngle={2}
+                      dataKey="value"
+                      stroke="transparent"
+                      animationDuration={1500}
+                      animationEasing="ease-out"
+                    >
+                      {customerData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-bold text-foreground">{animatedStats.customers}%</span>
+                  <span className="text-[10px] text-muted-foreground">Total</span>
+                </div>
+              </div>
+              <div className="flex justify-center gap-4 mt-2">
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-primary">+18%</p>
+                  <p className="text-[10px] text-muted-foreground">Journalier</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-secondary">+14%</p>
+                  <p className="text-[10px] text-muted-foreground">Hebdo</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Transactions + Quick Transfer */}
+            <div className="lg:col-span-4 space-y-4">
+              {/* Transactions */}
+              <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-foreground text-sm">Transactions</h3>
+                  <Button variant="ghost" size="sm" className="text-xs h-6 text-muted-foreground">
+                    Voir tout
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  {transactions.map((tx, i) => (
+                    <div
+                      key={tx.name}
+                      className="flex items-center justify-between py-1"
+                      data-aos="fade-left"
+                      data-aos-delay={i * 50}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", tx.color)}>
+                          <CreditCard className="w-3 h-3 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-foreground">{tx.name}</p>
+                          <p className="text-[9px] text-muted-foreground">{tx.date}</p>
+                        </div>
+                      </div>
+                      <span className={cn("text-xs font-bold", tx.amount.startsWith('+') ? 'text-primary' : 'text-secondary')}>
+                        {tx.amount}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick Transfer */}
+              <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up" data-aos-delay="300">
+                <h3 className="font-semibold text-foreground text-sm mb-3">Transfert Rapide</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[10px] text-muted-foreground">Numéro de carte</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input
+                        placeholder="4566 8526 95548"
+                        className="h-8 text-xs rounded-lg"
+                      />
+                      <div className="flex gap-1">
+                        <div className="w-6 h-4 bg-blue-600 rounded-sm" />
+                        <div className="w-6 h-4 bg-secondary rounded-sm" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1">
+                      <label className="text-[10px] text-muted-foreground">Montant</label>
+                      <Input
+                        placeholder="$ 5,000.99"
+                        className="h-8 text-xs rounded-lg mt-1"
+                      />
+                    </div>
+                    <Button size="sm" className="h-8 w-8 rounded-lg mt-5 bg-primary hover:bg-primary/90">
+                      <Send className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row - Best Products Table */}
+          <div className="bg-card rounded-2xl p-4 shadow-sm" data-aos="fade-up">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-foreground text-sm">Meilleurs Produits</h3>
+              <select className="text-xs bg-muted rounded-lg px-3 py-1.5 border-0">
+                <option>Mensuel</option>
+                <option>Hebdomadaire</option>
+              </select>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                    <th className="text-left pb-3 font-medium">Nom</th>
+                    <th className="text-left pb-3 font-medium">Équipe</th>
+                    <th className="text-left pb-3 font-medium">Type</th>
+                    <th className="text-left pb-3 font-medium">Total Deals</th>
+                    <th className="text-left pb-3 font-medium">Livraison</th>
+                    <th className="text-left pb-3 font-medium">En attente</th>
+                    <th className="text-left pb-3 font-medium">Progrès</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bestProductsTable.map((row, i) => (
+                    <tr
+                      key={row.name}
+                      className="border-t border-border/50"
+                      data-aos="fade-up"
+                      data-aos-delay={i * 100}
+                    >
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white text-xs font-semibold">
+                            {row.name.charAt(0)}
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-foreground">{row.name}</p>
+                            <p className="text-[10px] text-primary">Actif</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 text-xs text-muted-foreground">{row.team}</td>
+                      <td className="py-3 text-xs text-muted-foreground">{row.type}</td>
+                      <td className="py-3 text-xs font-medium text-foreground">{row.deals}</td>
+                      <td className="py-3 text-xs text-muted-foreground">{row.delivery}</td>
+                      <td className="py-3 text-xs text-muted-foreground">{row.pending}</td>
+                      <td className="py-3 w-32">
+                        <div className="flex items-center gap-2">
+                          <Progress
+                            value={progressValues[i] || 0}
+                            className="h-2 flex-1 transition-all duration-1000"
+                          />
+                          <span className="text-[10px] text-muted-foreground w-8">
+                            {progressValues[i] || 0}%
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </main>
       </div>
     </div>
