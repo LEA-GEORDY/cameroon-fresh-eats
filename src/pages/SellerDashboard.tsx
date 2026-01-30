@@ -1,13 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { 
   LayoutDashboard, Package, ShoppingBag, MessageCircle, Settings, 
-  Plus, Edit, Trash2, Eye, Users, ChevronRight, Bell, Search, Menu, 
-  LogOut, HelpCircle, TrendingUp, DollarSign, BarChart3, Star, ShoppingCart
+  Search, Menu, LogOut, TrendingUp, Users, Truck, Calendar,
+  MoreHorizontal, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import logo from "@/assets/logo.png";
 import noOrdersImg from "@/assets/empty-states/no-orders.png";
 import noDataImg from "@/assets/empty-states/no-data.png";
@@ -17,21 +26,36 @@ import "aos/dist/aos.css";
 const SellerDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [progressValues, setProgressValues] = useState({
+    onDelivery: 0,
+    shipped: 0,
+    confirmed: 0,
+    pending: 0,
+  });
 
   useEffect(() => {
     AOS.init({ duration: 600, once: true, easing: "ease-out-cubic" });
   }, []);
 
+  // Animated progress bars
+  useEffect(() => {
+    const targets = { onDelivery: 65, shipped: 45, confirmed: 80, pending: 30 };
+    const timer = setTimeout(() => {
+      setProgressValues(targets);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Animated counters
   const [animatedStats, setAnimatedStats] = useState({
-    sales: 0,
-    orders: 0,
+    network: 0,
     revenue: 0,
-    commission: 0
+    customers: 0,
+    delivery: 0,
   });
 
   useEffect(() => {
-    const targets = { sales: 1250, orders: 342, revenue: 875000, commission: 8750 };
+    const targets = { network: 742, revenue: 23.43, customers: 14030, delivery: 1162 };
     const duration = 2000;
     const steps = 60;
     const stepDuration = duration / steps;
@@ -43,10 +67,10 @@ const SellerDashboard = () => {
       const easeOut = 1 - Math.pow(1 - progress, 3);
 
       setAnimatedStats({
-        sales: Math.floor(targets.sales * easeOut),
-        orders: Math.floor(targets.orders * easeOut),
-        revenue: Math.floor(targets.revenue * easeOut),
-        commission: Math.floor(targets.commission * easeOut),
+        network: Math.floor(targets.network * easeOut),
+        revenue: parseFloat((targets.revenue * easeOut).toFixed(2)),
+        customers: Math.floor(targets.customers * easeOut),
+        delivery: Math.floor(targets.delivery * easeOut),
       });
 
       if (currentStep >= steps) clearInterval(interval);
@@ -55,101 +79,105 @@ const SellerDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const recentOrders = [
-    { id: "CMD-001", customer: "Marie K.", product: "Orange Mangue x3", amount: "2,400 FCFA", status: "Livre" },
-    { id: "CMD-002", customer: "Jean P.", product: "Detox Vert x2", amount: "1,900 FCFA", status: "En cours" },
-    { id: "CMD-003", customer: "Aminata D.", product: "Tropical x5", amount: "3,750 FCFA", status: "En attente" },
-    { id: "CMD-004", customer: "Paul E.", product: "Berry Blast x1", amount: "900 FCFA", status: "Livre" },
-  ];
+  // Revenue chart data
+  const revenueData = useMemo(() => [
+    { name: "Dim", food: 25000, photography: 18000, room: 12000 },
+    { name: "Lun", food: 32000, photography: 22000, room: 15000 },
+    { name: "Mar", food: 28000, photography: 35000, room: 18000 },
+    { name: "Mer", food: 45000, photography: 28000, room: 22000 },
+    { name: "Jeu", food: 38000, photography: 42000, room: 28000 },
+    { name: "Ven", food: 52000, photography: 35000, room: 32000 },
+    { name: "Sam", food: 48000, photography: 38000, room: 25000 },
+  ], []);
 
-  const topProducts = [
-    { name: "Orange Mangue Passion", sales: 245, revenue: "196,000 FCFA", rating: 4.8 },
-    { name: "Detox Vert Energie", sales: 189, revenue: "179,550 FCFA", rating: 4.6 },
-    { name: "Tropical Paradise", sales: 156, revenue: "117,000 FCFA", rating: 4.9 },
-  ];
+  // Order summary data
+  const orderSummary = useMemo(() => [
+    { label: "En livraison", value: "125K", progress: 65, color: "bg-secondary" },
+    { label: "Expédiés", value: "52K", progress: 45, color: "bg-primary" },
+    { label: "Confirmés", value: "420K", progress: 80, color: "bg-orange" },
+    { label: "En attente", value: "24K", progress: 30, color: "bg-muted-foreground" },
+  ], []);
 
-  const activities = [
-    { text: "Nouvelle commande recue de Marie K.", time: "Il y a 5 min", type: "order" },
-    { text: "Paiement de 45,000 FCFA confirme", time: "Il y a 1h", type: "payment" },
-    { text: "Produit 'Gingembre Citron' en rupture de stock", time: "Il y a 3h", type: "alert" },
-    { text: "Nouvel avis 5 etoiles sur Tropical Paradise", time: "Il y a 6h", type: "review" },
-  ];
+  // Recent orders
+  const recentOrders = useMemo(() => [
+    { 
+      id: "001",
+      name: "Gâteau Choco Deluxe", 
+      location: "DPD Messenger.co", 
+      price: "$87.00", 
+      qty: "2",
+      status: "Processing",
+      avatar: "bg-gradient-to-r from-amber-600 to-amber-800"
+    },
+    { 
+      id: "002",
+      name: "Burger Signature", 
+      location: "CDF San Loem Store", 
+      price: "$27.00", 
+      qty: "1",
+      status: "Approved",
+      avatar: "bg-gradient-to-r from-orange-500 to-red-500"
+    },
+  ], []);
 
-  const navItems = [
-    { id: "overview", label: "Tableau de bord", icon: LayoutDashboard },
-    { id: "products", label: "Mes Produits", icon: Package },
-    { id: "orders", label: "Commandes", icon: ShoppingBag },
-    { id: "messages", label: "Messages", icon: MessageCircle },
-    { id: "analytics", label: "Statistiques", icon: BarChart3 },
-    { id: "settings", label: "Parametres", icon: Settings },
-  ];
+  // Trending menus
+  const trendingMenus = useMemo(() => [
+    { name: "Gâteau Choco Deluxe", orders: 120, trend: "+12%", avatar: "bg-gradient-to-r from-amber-600 to-amber-800" },
+    { name: "Orange Mangue Fresh", orders: 98, trend: "+8%", avatar: "bg-gradient-to-r from-orange-400 to-yellow-400" },
+    { name: "Detox Vert Energie", orders: 85, trend: "+15%", avatar: "bg-gradient-to-r from-green-500 to-emerald-400" },
+  ], []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Livre": return "bg-primary/10 text-primary";
-      case "En cours": return "bg-secondary/10 text-secondary";
-      case "En attente": return "bg-orange/10 text-orange";
-      default: return "bg-muted text-muted-foreground";
-    }
-  };
+  const navItems = useMemo(() => [
+    { id: "overview", icon: LayoutDashboard },
+    { id: "orders", icon: ShoppingBag },
+    { id: "products", icon: Package },
+    { id: "messages", icon: MessageCircle },
+    { id: "settings", icon: Settings },
+  ], []);
+
+  const colors = useMemo(() => ({
+    primary: "hsl(142 70% 45%)",
+    secondary: "hsl(32 95% 55%)",
+    orange: "hsl(25 100% 50%)",
+  }), []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-primary transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 rounded-r-[2rem]`}>
-        <div className="flex flex-col h-full text-white">
-          {/* Logo */}
-          <div className="p-6" data-aos="fade-right">
-            <Link to="/" className="flex items-center gap-3">
-              <img src={logo} alt="VitaDrinks" className="w-10 h-10 rounded-xl" />
-              <span className="font-display text-lg font-bold">VitaDrinks</span>
-            </Link>
-          </div>
+    <div className="min-h-screen bg-[hsl(30_40%_96%)] flex">
+      {/* Sidebar - Icon only */}
+      <aside className={`fixed inset-y-0 left-0 z-50 w-16 bg-card border-r border-border transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 flex flex-col items-center py-4`}>
+        {/* Logo */}
+        <div className="mb-8" data-aos="fade-down">
+          <Link to="/">
+            <img src={logo} alt="VitaDrinks" className="w-10 h-10 rounded-xl" />
+          </Link>
+        </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 space-y-1">
-            {navItems.map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                data-aos="fade-right"
-                data-aos-delay={index * 50}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all ${
-                  activeTab === item.id
-                    ? "bg-white/20 text-white shadow-lg"
-                    : "text-white/70 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium text-sm">{item.label}</span>
-                </div>
-              </button>
-            ))}
-          </nav>
+        {/* Navigation Icons */}
+        <nav className="flex-1 flex flex-col items-center gap-2">
+          {navItems.map((item, index) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              data-aos="fade-right"
+              data-aos-delay={index * 50}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                activeTab === item.id
+                  ? "bg-primary text-white shadow-lg"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <item.icon className="w-5 h-5" />
+            </button>
+          ))}
+        </nav>
 
-          {/* Support Card */}
-          <div className="p-4" data-aos="fade-up">
-            <div className="bg-white/10 rounded-2xl p-4 text-center backdrop-blur-sm">
-              <div className="w-16 h-16 mx-auto mb-3 bg-white/20 rounded-full flex items-center justify-center">
-                <HelpCircle className="w-8 h-8 text-white/80" />
-              </div>
-              <p className="text-sm text-white/80">Besoin d'aide?</p>
-              <Button variant="secondary" size="sm" className="mt-2 w-full rounded-xl">
-                Support 24/7
-              </Button>
-            </div>
-          </div>
-
-          {/* Quit Button */}
-          <div className="p-4">
-            <Link to="/">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-white/70 hover:text-white hover:bg-white/10 rounded-xl">
-                <LogOut className="w-5 h-5" />
-                Quitter
-              </Button>
-            </Link>
-          </div>
+        {/* Logout */}
+        <div data-aos="fade-up">
+          <Link to="/">
+            <button className="w-10 h-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </Link>
         </div>
       </aside>
 
@@ -162,46 +190,34 @@ const SellerDashboard = () => {
       )}
 
       {/* Main Content */}
-      <div className="lg:pl-64">
+      <div className="flex-1 lg:pl-16">
         {/* Header */}
-        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-xl border-b border-border/50">
-          <div className="flex items-center justify-between px-6 h-16">
+        <header className="sticky top-0 z-30 bg-[hsl(30_40%_96%)]/80 backdrop-blur-xl px-6 py-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="p-2 rounded-lg hover:bg-muted lg:hidden"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               </button>
-              <h1 className="text-xl font-semibold text-foreground">
-                {navItems.find(n => n.id === activeTab)?.label || "Tableau de bord"}
-              </h1>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
+              
+              {/* Search */}
+              <div className="hidden md:flex items-center gap-2 px-4 py-2.5 bg-card rounded-full shadow-sm border border-border/50 w-80">
                 <Search className="w-4 h-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Rechercher..." 
-                  className="border-0 bg-transparent h-auto p-0 focus-visible:ring-0 w-40"
+                  placeholder="Rechercher menus, commandes..." 
+                  className="border-0 bg-transparent h-auto p-0 focus-visible:ring-0 text-sm"
                 />
               </div>
-              
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-secondary text-secondary-foreground text-xs rounded-full flex items-center justify-center">
-                  4
-                </span>
-              </Button>
+            </div>
 
-              <div className="flex items-center gap-3">
-                <div className="text-right hidden sm:block">
-                  <p className="text-sm font-medium">Ma Boutique</p>
-                  <p className="text-xs text-muted-foreground">Vendeur Premium</p>
-                </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
-                  <span className="font-semibold text-white text-sm">MB</span>
-                </div>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Calendar className="w-5 h-5 text-muted-foreground" />
+              </Button>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                <span className="font-semibold text-white text-sm">MB</span>
               </div>
             </div>
           </div>
@@ -211,97 +227,247 @@ const SellerDashboard = () => {
         <main className="p-6">
           {activeTab === "overview" && (
             <div className="space-y-6">
+              {/* Title */}
+              <div data-aos="fade-down">
+                <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+              </div>
+
               {/* Stats Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-gradient-to-br from-primary to-primary/80 rounded-2xl p-5 text-white" data-aos="fade-up" data-aos-delay="0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total Network */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white/80 text-sm">Ventes totales</p>
-                      <p className="text-3xl font-bold mt-1">{animatedStats.sales.toLocaleString()}</p>
-                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" /> +12% ce mois
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Total Network</p>
+                      <p className="text-3xl font-bold text-foreground">{animatedStats.network}</p>
                     </div>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <ShoppingCart className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
+                      <Users className="w-6 h-6 text-secondary" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-secondary to-secondary/80 rounded-2xl p-5 text-white" data-aos="fade-up" data-aos-delay="100">
+                {/* Total Revenue */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up" data-aos-delay="100">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white/80 text-sm">Commandes</p>
-                      <p className="text-3xl font-bold mt-1">{animatedStats.orders}</p>
-                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" /> +8% ce mois
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
+                      <p className="text-3xl font-bold text-foreground">${animatedStats.revenue.toFixed(2)}</p>
                     </div>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Package className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-primary" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-orange to-orange/80 rounded-2xl p-5 text-white" data-aos="fade-up" data-aos-delay="200">
+                {/* Total Customers */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up" data-aos-delay="200">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white/80 text-sm">Revenus</p>
-                      <p className="text-2xl font-bold mt-1">{animatedStats.revenue.toLocaleString()} FCFA</p>
-                      <p className="text-xs text-white/70 mt-1 flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" /> +15% ce mois
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Total Customers</p>
+                      <p className="text-3xl font-bold text-foreground">{animatedStats.customers.toLocaleString()}</p>
                     </div>
-                    <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                      <DollarSign className="w-6 h-6" />
+                    <div className="w-12 h-12 rounded-full bg-orange/10 flex items-center justify-center">
+                      <Users className="w-6 h-6 text-orange" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-card rounded-2xl p-5 border border-border shadow-card" data-aos="fade-up" data-aos-delay="300">
+                {/* Total Delivery */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up" data-aos-delay="300">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-muted-foreground text-sm">Commission (1%)</p>
-                      <p className="text-2xl font-bold text-foreground mt-1">{animatedStats.commission.toLocaleString()} FCFA</p>
-                      <p className="text-xs text-primary mt-1">Prelevee ce mois</p>
+                      <p className="text-xs text-muted-foreground mb-1">Total Delivery</p>
+                      <p className="text-3xl font-bold text-foreground">{animatedStats.delivery}</p>
                     </div>
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                      <BarChart3 className="w-6 h-6 text-primary" />
+                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                      <Truck className="w-6 h-6 text-muted-foreground" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Main Grid */}
+              {/* Revenue Chart & Order Summary */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Recent Orders */}
-                <div className="lg:col-span-2 bg-card rounded-2xl p-6 shadow-card border border-border/50" data-aos="fade-up">
+                {/* Revenue Chart */}
+                <div className="lg:col-span-2 bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Commandes recentes</h3>
-                    <Button variant="ghost" size="sm" className="text-primary">Voir tout</Button>
+                    <h3 className="font-semibold text-foreground">Revenue</h3>
+                    <div className="flex items-center gap-4 text-xs">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-primary" />
+                        Food
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-secondary" />
+                        Photography
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-orange" />
+                        Room
+                      </span>
+                      <Button variant="outline" size="sm" className="h-7 text-xs rounded-lg">
+                        Mensuel <ChevronDown className="w-3 h-3 ml-1" />
+                      </Button>
+                    </div>
                   </div>
+                  
+                  <div className="text-2xl font-bold text-foreground mb-4">
+                    $45,600
+                  </div>
+
+                  <div className="h-52">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={revenueData}>
+                        <defs>
+                          <linearGradient id="colorFood" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={colors.primary} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={colors.primary} stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="colorPhoto" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={colors.secondary} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={colors.secondary} stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="colorRoom" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={colors.orange} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={colors.orange} stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(142 20% 88%)" vertical={false} />
+                        <XAxis 
+                          dataKey="name" 
+                          tickLine={false} 
+                          axisLine={false} 
+                          fontSize={11} 
+                          stroke="hsl(142 20% 45%)"
+                        />
+                        <YAxis hide />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'hsl(0 0% 100%)',
+                            border: '1px solid hsl(142 20% 88%)',
+                            borderRadius: '8px',
+                            fontSize: '11px',
+                          }}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="food"
+                          stroke={colors.primary}
+                          strokeWidth={2.5}
+                          fillOpacity={1}
+                          fill="url(#colorFood)"
+                          animationDuration={2000}
+                          animationEasing="ease-out"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="photography"
+                          stroke={colors.secondary}
+                          strokeWidth={2.5}
+                          fillOpacity={1}
+                          fill="url(#colorPhoto)"
+                          animationDuration={2000}
+                          animationEasing="ease-out"
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="room"
+                          stroke={colors.orange}
+                          strokeWidth={2.5}
+                          fillOpacity={1}
+                          fill="url(#colorRoom)"
+                          animationDuration={2000}
+                          animationEasing="ease-out"
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Order Summary */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up" data-aos-delay="100">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-foreground">Résumé commandes</h3>
+                    <Button variant="outline" size="sm" className="h-7 text-xs rounded-lg">
+                      Mensuel <ChevronDown className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {orderSummary.map((item, index) => (
+                      <div key={item.label} data-aos="fade-left" data-aos-delay={index * 100}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm text-foreground">{item.label}</span>
+                          <span className="text-sm font-semibold text-foreground">{item.value}</span>
+                        </div>
+                        <Progress 
+                          value={progressValues[item.label === "En livraison" ? "onDelivery" : 
+                                 item.label === "Expédiés" ? "shipped" :
+                                 item.label === "Confirmés" ? "confirmed" : "pending"]} 
+                          className="h-2 transition-all duration-1000"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Orders & Trending Menus */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Recent Order Request */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-foreground">Commandes récentes</h3>
+                    <Button variant="outline" size="sm" className="h-7 text-xs rounded-lg">
+                      Mensuel <ChevronDown className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
+                  
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="text-left text-sm text-muted-foreground border-b border-border">
-                          <th className="pb-3 font-medium">ID</th>
-                          <th className="pb-3 font-medium">Client</th>
-                          <th className="pb-3 font-medium">Produit</th>
-                          <th className="pb-3 font-medium">Montant</th>
-                          <th className="pb-3 font-medium">Statut</th>
+                        <tr className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                          <th className="text-left pb-3 font-medium">Item</th>
+                          <th className="text-left pb-3 font-medium">Location</th>
+                          <th className="text-left pb-3 font-medium">Prix</th>
+                          <th className="text-left pb-3 font-medium">Qté</th>
+                          <th className="text-left pb-3 font-medium">Statut</th>
+                          <th className="text-left pb-3 font-medium"></th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-border">
+                      <tbody>
                         {recentOrders.map((order, index) => (
-                          <tr key={order.id} className="text-sm" data-aos="fade-left" data-aos-delay={index * 50}>
-                            <td className="py-3 font-medium text-foreground">{order.id}</td>
-                            <td className="py-3 text-foreground">{order.customer}</td>
-                            <td className="py-3 text-muted-foreground">{order.product}</td>
-                            <td className="py-3 font-medium text-foreground">{order.amount}</td>
+                          <tr 
+                            key={order.id} 
+                            className="border-t border-border/50"
+                            data-aos="fade-up"
+                            data-aos-delay={index * 100}
+                          >
                             <td className="py-3">
-                              <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(order.status)}`}>
+                              <div className="flex items-center gap-2">
+                                <div className={`w-8 h-8 rounded-full ${order.avatar} flex items-center justify-center`}>
+                                  <Package className="w-4 h-4 text-white" />
+                                </div>
+                                <span className="text-xs font-medium text-foreground">{order.name}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 text-xs text-muted-foreground">{order.location}</td>
+                            <td className="py-3 text-xs font-medium text-foreground">{order.price}</td>
+                            <td className="py-3 text-xs text-muted-foreground">{order.qty}</td>
+                            <td className="py-3">
+                              <span className={`text-[10px] px-2 py-1 rounded-full font-medium ${
+                                order.status === "Approved" 
+                                  ? "bg-primary/10 text-primary" 
+                                  : "bg-secondary/10 text-secondary"
+                              }`}>
                                 {order.status}
                               </span>
+                            </td>
+                            <td className="py-3">
+                              <Button variant="ghost" size="icon" className="h-6 w-6">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
                             </td>
                           </tr>
                         ))}
@@ -310,83 +476,34 @@ const SellerDashboard = () => {
                   </div>
                 </div>
 
-                {/* Top Products */}
-                <div className="bg-card rounded-2xl p-6 shadow-card border border-border/50" data-aos="fade-up" data-aos-delay="100">
+                {/* Daily Trending Menus */}
+                <div className="bg-card rounded-2xl p-5 shadow-sm" data-aos="fade-up" data-aos-delay="100">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">Produits populaires</h3>
-                    <Button variant="ghost" size="sm" className="text-primary">Voir</Button>
+                    <h3 className="font-semibold text-foreground">Menus tendance</h3>
+                    <Button variant="outline" size="sm" className="h-7 text-xs rounded-lg">
+                      Mensuel <ChevronDown className="w-3 h-3 ml-1" />
+                    </Button>
                   </div>
-                  <div className="space-y-4">
-                    {topProducts.map((product, index) => (
+                  
+                  <div className="space-y-3">
+                    {trendingMenus.map((menu, index) => (
                       <div 
-                        key={product.name} 
-                        className="p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
-                        data-aos="fade-right"
-                        data-aos-delay={index * 50}
+                        key={menu.name}
+                        className="flex items-center justify-between p-3 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                        data-aos="fade-left"
+                        data-aos-delay={index * 100}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="font-medium text-foreground text-sm truncate">{product.name}</p>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-3 h-3 text-accent fill-accent" />
-                            <span className="text-xs font-medium">{product.rating}</span>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl ${menu.avatar} flex items-center justify-center`}>
+                            <Package className="w-5 h-5 text-white" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{menu.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{menu.orders} commandes</p>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>{product.sales} ventes</span>
-                          <span className="text-primary font-medium">{product.revenue}</span>
-                        </div>
+                        <span className="text-xs font-semibold text-primary">{menu.trend}</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Activity & Quick Actions */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Activity Feed */}
-                <div className="bg-card rounded-2xl p-6 shadow-card border border-border/50" data-aos="fade-up">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Activite recente</h3>
-                  <div className="space-y-4">
-                    {activities.map((activity, index) => (
-                      <div 
-                        key={index} 
-                        className="flex items-start gap-3"
-                        data-aos="fade-left"
-                        data-aos-delay={index * 50}
-                      >
-                        <div className={`w-2 h-2 rounded-full mt-2 ${
-                          activity.type === 'order' ? 'bg-primary' :
-                          activity.type === 'payment' ? 'bg-secondary' :
-                          activity.type === 'alert' ? 'bg-orange' : 'bg-accent'
-                        }`} />
-                        <div className="flex-1">
-                          <p className="text-sm text-foreground">{activity.text}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{activity.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="bg-card rounded-2xl p-6 shadow-card border border-border/50" data-aos="fade-up" data-aos-delay="100">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Actions rapides</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      { icon: Plus, label: "Ajouter produit", color: "from-primary to-primary/80" },
-                      { icon: Package, label: "Gerer stock", color: "from-secondary to-secondary/80" },
-                      { icon: MessageCircle, label: "Messages", color: "from-orange to-orange/80" },
-                      { icon: BarChart3, label: "Statistiques", color: "from-accent to-accent/80" },
-                    ].map((action, index) => (
-                      <button
-                        key={action.label}
-                        className={`bg-gradient-to-r ${action.color} p-4 rounded-xl text-white text-center hover:opacity-90 transition-opacity`}
-                        data-aos="zoom-in"
-                        data-aos-delay={index * 50}
-                      >
-                        <action.icon className="w-6 h-6 mx-auto mb-2" />
-                        <p className="text-sm font-medium">{action.label}</p>
-                      </button>
                     ))}
                   </div>
                 </div>
@@ -403,11 +520,11 @@ const SellerDashboard = () => {
                   alt="Empty state" 
                   className="w-48 h-48 mx-auto mb-6 object-contain"
                 />
-                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                  Section {navItems.find(n => n.id === activeTab)?.label}
+                <h2 className="text-2xl font-bold text-foreground mb-2">
+                  Section {navItems.find(n => n.id === activeTab)?.id || activeTab}
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Cette fonctionnalite sera bientot disponible. Restez connecte!
+                  Cette fonctionnalité sera bientôt disponible. Restez connecté!
                 </p>
                 <Button onClick={() => setActiveTab("overview")} className="rounded-xl">
                   Retour au tableau de bord
